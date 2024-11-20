@@ -12,6 +12,7 @@
                 <li><a href="{% url 'about' %}">О нас</a></li>
                 <li><a href="{% url 'news' %}">Новости</a></li>
                 {% if user.is_authenticated %}
+                    <li><a href="{% url 'profile' %}">Профиль</a></li>
                     <li>{{ user.username }}. <a href="{% url 'logout' %}">Выйти</a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}">Войти</a></li>

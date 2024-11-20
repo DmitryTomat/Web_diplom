@@ -25,3 +25,10 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'is_staff', 'is_superuser']
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(UserForm, self).__init__(*args, **kwargs)
+        if not self.request.user.is_staff:
+            self.fields.pop('is_staff')
+            self.fields.pop('is_superuser')
