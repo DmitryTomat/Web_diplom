@@ -72,5 +72,14 @@ def register_view(request):
         form = RegistrationForm()
     return render(request, 'register.html', {'form': form})
 
-def home(request):
+def home_view(request):
     return render(request, 'home.html')
+
+def software_view(request):
+    return render(request, 'software.html')
+
+def about_view(request):
+    return render(request, 'about.html')
+
+def news_view(request):
+    return render(request, 'news.html')
