@@ -1,12 +1,7 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from .forms import LoginForm, RegistrationForm
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import User
-from .forms import LoginForm, UserForm
-
+from django.contrib.auth import logout
+from .forms import RegistrationForm
+from django.shortcuts import get_object_or_404
+from .forms import UserForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import user_passes_test
@@ -83,3 +78,7 @@ def about_view(request):
 
 def news_view(request):
     return render(request, 'news.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')

@@ -12,4 +12,5 @@ urlpatterns = [
     path('software/', views.software_view, name='software'),
     path('about/', views.about_view, name='about'),
     path('news/', views.news_view, name='news'),
+    path('logout/', views.logout_view, name='logout'),
 ]

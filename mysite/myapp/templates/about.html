@@ -1,18 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>О нас</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}О нас{% endblock %}
+
+{% block content %}
     <h2>О нас</h2>
-    <nav>
-        <ul>
-            <li><a href="{% url 'home' %}">Главная</a></li>
-            <li><a href="{% url 'software' %}">Программное обеспечение</a></li>
-            <li><a href="{% url 'about' %}">О нас</a></li>
-            <li><a href="{% url 'news' %}">Новости</a></li>
-        </ul>
-    </nav>
     <p>Здесь вы можете узнать больше о нашей компании.</p>
-</body>
-</html>
+{% endblock %}
