@@ -63,3 +63,6 @@ def news_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+def login_choice_view(request):
+    return render(request, 'login_choice.html')
