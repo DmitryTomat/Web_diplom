@@ -1,13 +1,11 @@
 from django.contrib.auth import logout
 from .forms import RegistrationForm
-from django.shortcuts import get_object_or_404
 from .forms import UserForm
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import User
 from .forms import LoginForm
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 def login_view(request):
     if request.method == 'POST':
@@ -66,3 +64,16 @@ def logout_view(request):
 
 def login_choice_view(request):
     return render(request, 'login_choice.html')
+
+@login_required
+def settings_user(request):
+    if request.method == 'POST':
+        user = request.user
+        user.username = request.POST.get('username')
+        user.email = request.POST.get('email')
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.save()
+        messages.success(request, 'Настройки успешно сохранены.')
+        return redirect('settings_user')
+    return render(request, 'settings_user.html')

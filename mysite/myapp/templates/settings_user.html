@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Настройки пользователя{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <h2>Настройки пользователя</h2>
+    <form method="post" action="{% url 'settings_user' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+        <div class="form-group">
+            <label for="first_name">Имя:</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
+        </div>
+        <div class="form-group">
+            <label for="last_name">Фамилия:</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
+        </div>
+        <div class="form-group">
+            <button type="submit">Сохранить изменения</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

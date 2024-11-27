@@ -23,8 +23,8 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'profile' %}">Профиль</a>
                     <div class="dropdown-content">
-                        <p>***Логин пользователя***: {{ user.username }}</p>
-                        <a href="{% url 'profile' %}">Настройки</a>
+                        <p>Логин пользователя: {{ user.username }}</p>
+                        <a href="{% url 'settings_user' %}">Настройки</a>
                         <a href="{% url 'logout' %}">Выйти</a>
                     </div>
                 {% else %}
