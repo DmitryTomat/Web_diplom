@@ -3,9 +3,10 @@ from .forms import RegistrationForm
 from .forms import UserForm
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
+from django.contrib.auth.models import User
 
 def login_view(request):
     if request.method == 'POST':
@@ -77,3 +78,23 @@ def settings_user(request):
         messages.success(request, 'Настройки успешно сохранены.')
         return redirect('settings_user')
     return render(request, 'settings_user.html')
+
+@user_passes_test(lambda u: u.is_staff)
+def user_list_view(request):
+    users = User.objects.all()
+    return render(request, 'user_list.html', {'users': users})
+
+@user_passes_test(lambda u: u.is_staff)
+def delete_user_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.delete()
+    messages.success(request, 'Пользователь успешно удален.')
+    return redirect('user_list')
+
+@user_passes_test(lambda u: u.is_staff)
+def toggle_staff_status_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user.is_staff = not user.is_staff
+    user.save()
+    messages.success(request, 'Роль пользователя успешно изменена.')
+    return redirect('user_list')

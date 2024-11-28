@@ -11,5 +11,7 @@
     </form>
     {% if user.is_staff %}
         <a href="{% url 'admin:index' %}">Перейти в админ-панель</a>
+        <br>
+        <a href="{% url 'user_list' %}">Пользователи</a>
     {% endif %}
 {% endblock %}
