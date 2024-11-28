@@ -3,10 +3,14 @@ from .forms import RegistrationForm
 from .forms import UserForm
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib import messages
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 def login_view(request):
     if request.method == 'POST':
@@ -74,6 +78,13 @@ def settings_user(request):
         user.email = request.POST.get('email')
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
+
+        # Обработка загрузки фотографии профиля
+        if 'profile_photo' in request.FILES:
+            profile_photo = request.FILES['profile_photo']
+            path = default_storage.save(f'profile_photos/{user.id}/{profile_photo.name}', ContentFile(profile_photo.read()))
+            user.profile_photo = path
+
         user.save()
         messages.success(request, 'Настройки успешно сохранены.')
         return redirect('settings_user')
@@ -98,3 +109,11 @@ def toggle_staff_status_view(request, user_id):
     user.save()
     messages.success(request, 'Роль пользователя успешно изменена.')
     return redirect('user_list')
+
+@login_required
+def research_list_view(request):
+    # Здесь вы можете получить список исследований для текущего пользователя
+    # Например, researches = Research.objects.filter(user=request.user)
+    # Замените Research на вашу модель исследований
+    researches = []  # Замените на реальный запрос к базе данных
+    return render(request, 'research_list.html', {'researches': researches})

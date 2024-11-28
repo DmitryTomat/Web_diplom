@@ -4,12 +4,33 @@
 
 {% block content %}
     <h2>Профиль</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Сохранить</button>
-    </form>
+    <div class="profile-info">
+        <div class="profile-photo">
+            {% if user.profile_photo %}
+                <img src="{{ user.profile_photo.url }}" alt="Фото профиля">
+            {% else %}
+                <p>Фото отсутствует</p>
+            {% endif %}
+        </div>
+        <div class="profile-details">
+            <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+            <p><strong>Статус:</strong>
+                {% if user.is_staff %}
+                    Администратор
+                {% else %}
+                    Пользователь
+                {% endif %}
+            </p>
+            <p><strong>Имя:</strong> {{ user.first_name }}</p>
+            <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+        </div>
+    </div>
+    <a href="{% url 'settings_user' %}">Редактировать профиль</a>
+    <br>
+    <a href="{% url 'research_list' %}">Список исследований</a>
     {% if user.is_staff %}
+        <br>
         <a href="{% url 'admin:index' %}">Перейти в админ-панель</a>
         <br>
         <a href="{% url 'user_list' %}">Пользователи</a>

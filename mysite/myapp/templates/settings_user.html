@@ -5,7 +5,7 @@
 {% block content %}
 <div class="settings-container">
     <h2>Настройки пользователя</h2>
-    <form method="post" action="{% url 'settings_user' %}">
+    <form method="post" action="{% url 'settings_user' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group">
             <label for="username">Имя пользователя:</label>
@@ -22,6 +22,10 @@
         <div class="form-group">
             <label for="last_name">Фамилия:</label>
             <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
+        </div>
+        <div class="form-group">
+            <label for="profile_photo">Фото профиля:</label>
+            <input type="file" id="profile_photo" name="profile_photo">
         </div>
         <div class="form-group">
             <button type="submit">Сохранить изменения</button>

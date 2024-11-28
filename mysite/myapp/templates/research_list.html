@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Список исследований{% endblock %}
+
+{% block content %}
+    <h2>Список исследований</h2>
+    <ul>
+        {% for research in researches %}
+            <li>{{ research.title }}</li>
+        {% empty %}
+            <li>Нет доступных исследований</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
