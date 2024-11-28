@@ -270,3 +270,7 @@ th {
 form {
     display: inline;
 }
+
+.error-message {
+    color: red
+}

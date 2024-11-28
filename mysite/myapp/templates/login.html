@@ -14,6 +14,11 @@
             <label for="password">Пароль</label>
             <input type="password" id="password" name="password" required>
         </div>
+        {% if form.errors %}
+            <div class="error-message">
+                Неправильно введён логин или пароль
+            </div>
+        {% endif %}
         <button type="submit" class="btn-primary">Войти</button>
         <a href="{% url 'register' %}">Зарегистрироваться</a>
     </form>
