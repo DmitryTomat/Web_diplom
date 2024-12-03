@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
@@ -19,4 +21,6 @@ urlpatterns = [
     path('research/create/', views.create_research_view, name='create_research'),
     path('users/<int:user_id>/research/', views.user_research_list_view, name='user_research_list'),
     path('research/sort/<str:sort_by>/<str:order>/', views.research_list_view, name='research_list_sorted'),
-]
+    path('research/<int:research_id>/', views.research_detail_view, name='research_detail'),
+    path('research/<int:research_id>/upload/', views.upload_file_view, name='upload_file'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

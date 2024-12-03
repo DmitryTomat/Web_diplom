@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Детали исследования{% endblock %}
+
+{% block content %}
+    <h2>{{ research.title }}</h2>
+    <p>{{ research.description }}</p>
+    <p>Дата создания: {{ research.created_at|date:"d.m.Y H:i" }}</p>
+
+    <h3>Загруженные файлы:</h3>
+    <ul>
+        {% for file in files %}
+            <li>
+                <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                <p>{{ file.description }}</p>
+            </li>
+        {% empty %}
+            <li>Файлы не загружены</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'upload_file' research.id %}">Загрузить файл</a>
+    <br>
+    <a href="{% url 'research_list' %}">Назад к списку исследований</a>
+{% endblock %}

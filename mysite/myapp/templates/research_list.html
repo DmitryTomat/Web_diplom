@@ -9,14 +9,16 @@
         <thead>
             <tr>
                 <th>
-                    <a href="{% url 'research_list_sorted' 'title' 'asc' %}">Название ↑</a>
-                    <a href="{% url 'research_list_sorted' 'title' 'desc' %}">Название ↓</a>
+                    <a href="{% url 'research_list_sorted' 'title' 'asc' %}">↑</a>
+                    <a href="{% url 'research_list_sorted' 'title' 'desc' %}">↓</a>
                 </th>
                 <th>Описание</th>
                 <th>
-                    <a href="{% url 'research_list_sorted' 'date' 'asc' %}">Дата создания ↑</a>
-                    <a href="{% url 'research_list_sorted' 'date' 'desc' %}">Дата создания ↓</a>
+                    <a href="{% url 'research_list_sorted' 'date' 'asc' %}">↑</a>
+                    <a href="{% url 'research_list_sorted' 'date' 'desc' %}">↓</a>
                 </th>
+                <th>Изображение</th>
+                <th>KML файл</th>
             </tr>
         </thead>
         <tbody>
@@ -25,6 +27,20 @@
                     <td>{{ research.title }}</td>
                     <td>{{ research.description }}</td>
                     <td>{{ research.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        {% if research.image %}
+                            <img src="{{ research.image.url }}" alt="{{ research.title }}" style="max-width: 100px;">
+                        {% else %}
+                            Нет изображения
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if research.kml_file %}
+                            <a href="{{ research.kml_file.url }}" download>Скачать KML</a>
+                        {% else %}
+                            Нет KML файла
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Research
+from .models import Research, ResearchFile
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
@@ -37,4 +37,9 @@ class UserForm(forms.ModelForm):
 class ResearchForm(forms.ModelForm):
     class Meta:
         model = Research
-        fields = ['title', 'description']
+        fields = ['title', 'description', 'image', 'kml_file']
+
+class ResearchFileForm(forms.ModelForm):
+    class Meta:
+        model = ResearchFile
+        fields = ['file', 'description']

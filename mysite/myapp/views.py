@@ -11,8 +11,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from .models import Research
-from .forms import ResearchForm
+from .models import Research, ResearchFile
+from .forms import ResearchForm, ResearchFileForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -132,7 +132,7 @@ def research_list_view(request, sort_by='title', order='asc'):
 @login_required
 def create_research_view(request):
     if request.method == 'POST':
-        form = ResearchForm(request.POST)
+        form = ResearchForm(request.POST, request.FILES)
         if form.is_valid():
             research = form.save(commit=False)
             research.user = request.user
@@ -147,3 +147,23 @@ def user_research_list_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
     researches = Research.objects.filter(user=user)
     return render(request, 'user_research_list.html', {'user': user, 'researches': researches})
+
+@login_required
+def upload_file_view(request, research_id):
+    research = get_object_or_404(Research, id=research_id, user=request.user)
+    if request.method == 'POST':
+        form = ResearchFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.save(commit=False)
+            file.research = research
+            file.save()
+            return redirect('research_detail', research_id=research.id)
+    else:
+        form = ResearchFileForm()
+    return render(request, 'upload_file.html', {'form': form, 'research': research})
+
+@login_required
+def research_detail_view(request, research_id):
+    research = get_object_or_404(Research, id=research_id, user=request.user)
+    files = ResearchFile.objects.filter(research=research)
+    return render(request, 'research_detail.html', {'research': research, 'files': files})

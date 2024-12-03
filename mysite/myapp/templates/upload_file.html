@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Загрузить файл{% endblock %}
+
+{% block content %}
+    <h2>Загрузить файл для исследования "{{ research.title }}"</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Загрузить</button>
+    </form>
+    <a href="{% url 'research_detail' research.id %}">Назад к исследованию</a>
+{% endblock %}
