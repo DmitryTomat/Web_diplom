@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import Research
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
@@ -32,3 +33,8 @@ class UserForm(forms.ModelForm):
         if not self.request.user.is_staff:
             self.fields.pop('is_staff')
             self.fields.pop('is_superuser')
+
+class ResearchForm(forms.ModelForm):
+    class Meta:
+        model = Research
+        fields = ['title', 'description']

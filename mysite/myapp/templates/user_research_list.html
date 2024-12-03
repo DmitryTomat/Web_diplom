@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Список исследований{% endblock %}
+{% block title %}Исследования пользователя {{ user.username }}{% endblock %}
 
 {% block content %}
-    <h2>Список исследований</h2>
-    <a href="{% url 'create_research' %}">Создать новое исследование</a>
+    <h2>Исследования пользователя {{ user.username }}</h2>
     <table>
         <thead>
             <tr>

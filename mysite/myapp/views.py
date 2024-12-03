@@ -11,6 +11,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from .models import Research
+from .forms import ResearchForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -113,8 +115,24 @@ def toggle_staff_status_view(request, user_id):
 
 @login_required
 def research_list_view(request):
-    # Здесь вы можете получить список исследований для текущего пользователя
-    # Например, researches = Research.objects.filter(user=request.user)
-    # Замените Research на вашу модель исследований
-    researches = []  # Замените на реальный запрос к базе данных
+    researches = Research.objects.filter(user=request.user)
     return render(request, 'research_list.html', {'researches': researches})
+
+@login_required
+def create_research_view(request):
+    if request.method == 'POST':
+        form = ResearchForm(request.POST)
+        if form.is_valid():
+            research = form.save(commit=False)
+            research.user = request.user
+            research.save()
+            return redirect('research_list')
+    else:
+        form = ResearchForm()
+    return render(request, 'create_research.html', {'form': form})
+
+@user_passes_test(lambda u: u.is_staff)
+def user_research_list_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    researches = Research.objects.filter(user=user)
+    return render(request, 'user_research_list.html', {'user': user, 'researches': researches})

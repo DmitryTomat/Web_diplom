@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load tz %}  <!-- Добавьте этот тег для загрузки фильтра timezone -->
+{% load tz %}
 
 {% block title %}Список пользователей{% endblock %}
 
@@ -48,6 +48,7 @@
                                 {% endif %}
                             </button>
                         </form>
+                        <a href="{% url 'user_research_list' user.id %}">Просмотреть исследования</a>
                     </td>
                 </tr>
             {% endfor %}

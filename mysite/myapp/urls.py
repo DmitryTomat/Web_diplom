@@ -16,4 +16,6 @@ urlpatterns = [
     path('users/delete/<int:user_id>/', views.delete_user_view, name='delete_user'),
     path('users/toggle_staff_status/<int:user_id>/', views.toggle_staff_status_view, name='toggle_staff_status'),
     path('research/', views.research_list_view, name='research_list'),
+    path('research/create/', views.create_research_view, name='create_research'),
+    path('users/<int:user_id>/research/', views.user_research_list_view, name='user_research_list'),
 ]
