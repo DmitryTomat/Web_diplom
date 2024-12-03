@@ -18,4 +18,5 @@ urlpatterns = [
     path('research/', views.research_list_view, name='research_list'),
     path('research/create/', views.create_research_view, name='create_research'),
     path('users/<int:user_id>/research/', views.user_research_list_view, name='user_research_list'),
+    path('research/sort/<str:sort_by>/<str:order>/', views.research_list_view, name='research_list_sorted'),
 ]

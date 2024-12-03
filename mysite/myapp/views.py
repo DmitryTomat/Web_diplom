@@ -114,9 +114,20 @@ def toggle_staff_status_view(request, user_id):
     return redirect('user_list')
 
 @login_required
-def research_list_view(request):
-    researches = Research.objects.filter(user=request.user)
-    return render(request, 'research_list.html', {'researches': researches})
+def research_list_view(request, sort_by='title', order='asc'):
+    # Определение полей для сортировки
+    sort_fields = {
+        'title': 'title',
+        'date': 'created_at',
+    }
+
+    # Определение порядка сортировки
+    sort_order = '' if order == 'asc' else '-'
+
+    # Получение отсортированных исследований
+    researches = Research.objects.filter(user=request.user).order_by(f'{sort_order}{sort_fields[sort_by]}')
+
+    return render(request, 'research_list.html', {'researches': researches, 'sort_by': sort_by, 'order': order})
 
 @login_required
 def create_research_view(request):

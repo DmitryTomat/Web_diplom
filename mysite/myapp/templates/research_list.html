@@ -8,9 +8,15 @@
     <table>
         <thead>
             <tr>
-                <th>Название</th>
+                <th>
+                    <a href="{% url 'research_list_sorted' 'title' 'asc' %}">Название ↑</a>
+                    <a href="{% url 'research_list_sorted' 'title' 'desc' %}">Название ↓</a>
+                </th>
                 <th>Описание</th>
-                <th>Дата создания</th>
+                <th>
+                    <a href="{% url 'research_list_sorted' 'date' 'asc' %}">Дата создания ↑</a>
+                    <a href="{% url 'research_list_sorted' 'date' 'desc' %}">Дата создания ↓</a>
+                </th>
             </tr>
         </thead>
         <tbody>
