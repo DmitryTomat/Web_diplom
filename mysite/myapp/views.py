@@ -3,16 +3,16 @@ from .forms import RegistrationForm
 from .forms import UserForm
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from .models import Research, ResearchFile
 from .forms import ResearchForm, ResearchFileForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Research, ResearchFile
+from .forms import MultipleFileUploadForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -150,6 +150,11 @@ def user_research_list_view(request, user_id):
 
 @login_required
 def upload_file_view(request, research_id):
+    if research_id == 0:
+        # Создаем новое исследование без данных
+        research = Research.objects.create(user=request.user)
+        research_id = research.id
+
     research = get_object_or_404(Research, id=research_id, user=request.user)
     if request.method == 'POST':
         form = ResearchFileForm(request.POST, request.FILES)
@@ -167,3 +172,23 @@ def research_detail_view(request, research_id):
     research = get_object_or_404(Research, id=research_id, user=request.user)
     files = ResearchFile.objects.filter(research=research)
     return render(request, 'research_detail.html', {'research': research, 'files': files})
+
+@login_required
+def edit_research_view(request, research_id):
+    research = get_object_or_404(Research, id=research_id, user=request.user)
+    if request.method == 'POST':
+        form = ResearchForm(request.POST, request.FILES, instance=research)
+        if form.is_valid():
+            form.save()
+            return redirect('research_detail', research_id=research.id)
+    else:
+        form = ResearchForm(instance=research)
+    return render(request, 'edit_research.html', {'form': form, 'research': research})
+
+@login_required
+def delete_research_view(request, research_id):
+    research = get_object_or_404(Research, id=research_id, user=request.user)
+    if request.method == 'POST':
+        research.delete()
+        return redirect('research_list')
+    return render(request, 'delete_research.html', {'research': research})

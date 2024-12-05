@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Research, ResearchFile
+from .widgets import MultipleFileInput
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
@@ -43,3 +44,6 @@ class ResearchFileForm(forms.ModelForm):
     class Meta:
         model = ResearchFile
         fields = ['file', 'description']
+
+class MultipleFileUploadForm(forms.Form):
+    files = forms.FileField(widget=MultipleFileInput(attrs={'multiple': True}))

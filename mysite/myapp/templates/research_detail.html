@@ -21,5 +21,9 @@
 
     <a href="{% url 'upload_file' research.id %}">Загрузить файл</a>
     <br>
+    <a href="{% url 'edit_research' research.id %}">Редактировать исследование</a>
+    <br>
+    <a href="{% url 'delete_research' research.id %}">Удалить исследование</a>
+    <br>
     <a href="{% url 'research_list' %}">Назад к списку исследований</a>
 {% endblock %}

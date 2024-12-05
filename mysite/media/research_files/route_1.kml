@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<name>Труба 1</name>
+<Placemark>
+<LineString>
+<coordinates>
+56.0617566,54.815292,0
+56.0617573,54.8152918,0
+56.0618327,54.8152715,0
+56.0617694,54.8153015,0
+56.0617285,54.8152515,0
+56.0617617,54.8152984,0
+</coordinates>
+</LineString>
+</Placemark>
+</Document>
+</kml>

@@ -23,4 +23,6 @@ urlpatterns = [
     path('research/sort/<str:sort_by>/<str:order>/', views.research_list_view, name='research_list_sorted'),
     path('research/<int:research_id>/', views.research_detail_view, name='research_detail'),
     path('research/<int:research_id>/upload/', views.upload_file_view, name='upload_file'),
+    path('research/<int:research_id>/edit/', views.edit_research_view, name='edit_research'),
+    path('research/<int:research_id>/delete/', views.delete_research_view, name='delete_research'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
