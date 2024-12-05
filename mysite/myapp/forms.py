@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import Research, ResearchFile
-from .widgets import MultipleFileInput
+from .models import Defect
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
@@ -45,5 +45,10 @@ class ResearchFileForm(forms.ModelForm):
         model = ResearchFile
         fields = ['file', 'description']
 
-class MultipleFileUploadForm(forms.Form):
-    files = forms.FileField(widget=MultipleFileInput(attrs={'multiple': True}))
+class DefectForm(forms.ModelForm):
+    class Meta:
+        model = Defect
+        fields = ['research', 'defect_date', 'defect_name', 'defect_description', 'defect_coordinates']
+
+class XMLUploadForm(forms.Form):
+    xml_file = forms.FileField()

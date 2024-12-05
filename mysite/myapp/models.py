@@ -20,3 +20,14 @@ class ResearchFile(models.Model):
 
     def __str__(self):
         return f"File for {self.research.title}"
+
+class Defect(models.Model):
+    research = models.ForeignKey(Research, on_delete=models.CASCADE, related_name='defects')
+    defect_date = models.DateTimeField()
+    defect_name = models.CharField(max_length=255)
+    defect_description = models.TextField()
+    defect_coordinates = models.CharField(max_length=255)
+    defect_type = models.CharField(max_length=255)  # Добавляем поле для типа дефекта
+
+    def __str__(self):
+        return f"{self.defect_name} - {self.research.title}"

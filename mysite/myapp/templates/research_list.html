@@ -60,13 +60,13 @@
                 text: 'Выберите способ создания:',
                 showCancelButton: true,
                 confirmButtonText: 'Создать вручную',
-                cancelButtonText: 'Загрузить KML-файл',
+                cancelButtonText: 'Загрузить XML-файл',
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = "{% url 'create_research' %}";
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    window.location.href = "{% url 'upload_file' 0 %}"; // Здесь нужно передать ID исследования, если он уже создан
+                    window.location.href = "{% url 'upload_xml' %}";
                 }
             });
         });

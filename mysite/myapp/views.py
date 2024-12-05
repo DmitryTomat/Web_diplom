@@ -8,11 +8,15 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from .forms import ResearchForm, ResearchFileForm
+from .forms import ResearchForm, ResearchFileForm, DefectForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Research, ResearchFile
-from .forms import MultipleFileUploadForm
+from .models import Research, ResearchFile, Defect
+import xml.etree.ElementTree as ET
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Research, Defect
+from .forms import XMLUploadForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -171,7 +175,8 @@ def upload_file_view(request, research_id):
 def research_detail_view(request, research_id):
     research = get_object_or_404(Research, id=research_id, user=request.user)
     files = ResearchFile.objects.filter(research=research)
-    return render(request, 'research_detail.html', {'research': research, 'files': files})
+    defects = Defect.objects.filter(research=research)  # Получаем дефекты исследования
+    return render(request, 'research_detail.html', {'research': research, 'files': files, 'defects': defects})
 
 @login_required
 def edit_research_view(request, research_id):
@@ -192,3 +197,56 @@ def delete_research_view(request, research_id):
         research.delete()
         return redirect('research_list')
     return render(request, 'delete_research.html', {'research': research})
+
+@login_required
+def add_defect_view(request, research_id):
+    research = get_object_or_404(Research, id=research_id, user=request.user)
+    if request.method == 'POST':
+        form = DefectForm(request.POST)
+        if form.is_valid():
+            defect = form.save(commit=False)
+            defect.research = research
+            defect.save()
+            return redirect('research_detail', research_id=research.id)
+    else:
+        form = DefectForm(initial={'research': research})
+    return render(request, 'add_defect.html', {'form': form, 'research': research})
+
+@login_required
+def upload_xml_view(request):
+    if request.method == 'POST':
+        form = XMLUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            xml_file = request.FILES['xml_file']
+            tree = ET.parse(xml_file)
+            root = tree.getroot()
+
+            # Создаем новое исследование
+            research = Research.objects.create(
+                user=request.user,
+                title=root.attrib['name'],
+                description='',
+                image=None,
+                kml_file=None
+            )
+
+            # Обрабатываем дефекты
+            defects_elem = root.find('.//Дефекты/pictures')
+            if defects_elem is not None:
+                for defect_elem in defects_elem:
+                    picture_elem = defect_elem.find('picture')
+                    description_elem = defect_elem.find('description')
+
+                    defect = Defect.objects.create(
+                        research=research,
+                        defect_date=research.created_at,
+                        defect_name=description_elem.find('defectText').text,
+                        defect_description=description_elem.find('lengthDefect').text,
+                        defect_coordinates=f"{picture_elem.attrib['latitude']}, {picture_elem.attrib['longitude']}",
+                        defect_type=description_elem.find('defectType').text
+                    )
+
+            return redirect('research_detail', research_id=research.id)
+    else:
+        form = XMLUploadForm()
+    return render(request, 'upload_xml.html', {'form': form})

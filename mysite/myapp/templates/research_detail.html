@@ -19,7 +19,35 @@
         {% endfor %}
     </ul>
 
-    <a href="{% url 'upload_file' research.id %}">Загрузить файл</a>
+    <h3>Дефекты:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Название дефекта</th>
+                <th>Описание дефекта</th>
+                <th>Дата и время дефекта</th>
+                <th>Координаты дефекта</th>
+                <th>Тип дефекта</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for defect in defects %}
+                <tr>
+                    <td>{{ defect.defect_name }}</td>
+                    <td>{{ defect.defect_description }}</td>
+                    <td>{{ defect.defect_date|date:"d.m.Y H:i" }}</td>
+                    <td>{{ defect.defect_coordinates }}</td>
+                    <td>{{ defect.defect_type }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">Дефекты не добавлены</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'add_defect' research.id %}">Добавить дефект</a>
     <br>
     <a href="{% url 'edit_research' research.id %}">Редактировать исследование</a>
     <br>
