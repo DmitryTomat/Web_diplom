@@ -414,3 +414,11 @@ form {
     margin-bottom: 20px; /* Устанавливает нижний внешний отступ */
     text-align: left; /* Выравниваем мета-информацию по левому краю */
 }
+
+/* Стили для переноса текста */
+.news-content, .news-block p {
+    word-wrap: break-word; /* Перенос текста на новую строку */
+    overflow-wrap: break-word; /* Альтернатива word-wrap */
+    margin-right:4%; /* Отступ справа */
+    margin-left:2%; /* Отступ слева */
+}
