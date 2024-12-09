@@ -31,3 +31,12 @@ class Defect(models.Model):
 
     def __str__(self):
         return f"{self.defect_name} - {self.research.title}"
+
+class News(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='news')
+
+    def __str__(self):
+        return self.title

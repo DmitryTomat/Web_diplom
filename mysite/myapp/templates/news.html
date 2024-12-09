@@ -4,5 +4,22 @@
 
 {% block content %}
     <h2>Новости</h2>
-    <p>Здесь вы можете прочитать последние новости.</p>
+    {% if user.is_staff %}
+        <a href="{% url 'create_news' %}" class="btn btn-primary">Создать новость</a>
+    {% endif %}
+    <div class="news-list">
+        {% for news in news_list %}
+            <div class="news-block">
+                <h3>{{ news.title }}</h3>
+                <p>{{ news.content }}</p>
+                <p class="news-meta">Автор: {{ news.author.username }} | Дата: {{ news.created_at }}</p>
+                {% if user.is_staff %}
+                    <div class="news-actions">
+                        <a href="{% url 'edit_news' news.id %}" class="btn btn-secondary">Редактировать</a>
+                        <a href="{% url 'delete_news' news.id %}" class="btn btn-danger">Удалить</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

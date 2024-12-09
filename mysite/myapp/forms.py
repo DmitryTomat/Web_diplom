@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import Research, ResearchFile
 from .models import Defect
+from .models import News
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
@@ -52,3 +53,8 @@ class DefectForm(forms.ModelForm):
 
 class XMLUploadForm(forms.Form):
     xml_file = forms.FileField()
+
+class NewsForm(forms.ModelForm):
+    class Meta:
+        model = News
+        fields = ['title', 'content']

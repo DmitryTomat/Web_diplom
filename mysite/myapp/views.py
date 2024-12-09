@@ -17,6 +17,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Research, Defect
 from .forms import XMLUploadForm
+from .models import News
+from .forms import NewsForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -250,3 +252,40 @@ def upload_xml_view(request):
     else:
         form = XMLUploadForm()
     return render(request, 'upload_xml.html', {'form': form})
+
+@user_passes_test(lambda u: u.is_staff)
+def create_news_view(request):
+    if request.method == 'POST':
+        form = NewsForm(request.POST)
+        if form.is_valid():
+            news = form.save(commit=False)
+            news.author = request.user
+            news.save()
+            return redirect('news')
+    else:
+        form = NewsForm()
+    return render(request, 'create_news.html', {'form': form})
+
+@user_passes_test(lambda u: u.is_staff)
+def edit_news_view(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    if request.method == 'POST':
+        form = NewsForm(request.POST, instance=news)
+        if form.is_valid():
+            form.save()
+            return redirect('news')
+    else:
+        form = NewsForm(instance=news)
+    return render(request, 'edit_news.html', {'form': form, 'news': news})
+
+@user_passes_test(lambda u: u.is_staff)
+def delete_news_view(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    if request.method == 'POST':
+        news.delete()
+        return redirect('news')
+    return render(request, 'delete_news.html', {'news': news})
+
+def news_view(request):
+    news_list = News.objects.all().order_by('-created_at')
+    return render(request, 'news.html', {'news_list': news_list})
