@@ -290,3 +290,7 @@ def news_view(request):
     sort_by = request.GET.get('sort_by', '-created_at')  # По умолчанию сортировка по убыванию даты создания
     news_list = News.objects.all().order_by(sort_by)
     return render(request, 'news.html', {'news_list': news_list, 'sort_by': sort_by})
+
+def news_detail_view(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    return render(request, 'news_detail.html', {'news': news})

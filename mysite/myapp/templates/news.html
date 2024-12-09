@@ -20,11 +20,11 @@
     <div class="news-list">
         {% for news in news_list %}
             <div class="news-block">
-                <h3>{{ news.title }}</h3>
+                <h3><a href="{% url 'news_detail' news.id %}">{{ news.title }}</a></h3>
                 {% if news.image %}
                     <img src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
                 {% endif %}
-                <p>{{ news.content }}</p>
+                <p>{{ news.content|truncatechars:20 }}</p>
                 <p class="news-meta">Автор: {{ news.author.username }} | Дата: {{ news.created_at }}</p>
                 {% if user.is_staff %}
                     <div class="news-actions">

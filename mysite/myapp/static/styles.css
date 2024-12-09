@@ -378,10 +378,77 @@ form {
     border-radius: 4px;
 }
 
+/* Стили для контейнера детальной новости */
+.news-detail-container {
+    text-align: center; /* Центрируем текст и элементы внутри контейнера */
+}
+
+/* Стили для заголовка новости */
+.news-title {
+    font-size: 28px;
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
 /* Стили для фотографий в новостях */
 .news-image {
     max-width: 100%;
     height: auto;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     border-radius: 5px;
+}
+
+/* Стили для содержимого новости */
+.news-content {
+    font-size: 18px;
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: left; /* Выравниваем описание по левому краю */
+}
+
+/* Стили для мета-информации новости */
+.news-meta {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 20px;
+    text-align: left; /* Выравниваем мета-информацию по левому краю */
+}
+
+/* Кнопки */
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    background-color: #007bff;
+    border: 1px solid #007bff;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn:hover {
+    color: #fff;
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
 }
