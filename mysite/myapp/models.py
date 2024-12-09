@@ -37,6 +37,7 @@ class News(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='news')
+    image = models.ImageField(upload_to='news_images/', blank=True, null=True)  # Добавляем поле для фотографии
 
     def __str__(self):
         return self.title

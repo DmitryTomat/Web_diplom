@@ -377,3 +377,11 @@ form {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+/* Стили для фотографий в новостях */
+.news-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}

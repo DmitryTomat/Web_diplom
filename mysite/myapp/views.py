@@ -256,7 +256,7 @@ def upload_xml_view(request):
 @user_passes_test(lambda u: u.is_staff)
 def create_news_view(request):
     if request.method == 'POST':
-        form = NewsForm(request.POST)
+        form = NewsForm(request.POST, request.FILES)  # Добавляем request.FILES
         if form.is_valid():
             news = form.save(commit=False)
             news.author = request.user
@@ -270,7 +270,7 @@ def create_news_view(request):
 def edit_news_view(request, news_id):
     news = get_object_or_404(News, id=news_id)
     if request.method == 'POST':
-        form = NewsForm(request.POST, instance=news)
+        form = NewsForm(request.POST, request.FILES, instance=news)  # Добавляем request.FILES
         if form.is_valid():
             form.save()
             return redirect('news')
