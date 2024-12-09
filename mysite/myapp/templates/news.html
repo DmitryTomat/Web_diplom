@@ -7,6 +7,16 @@
     {% if user.is_staff %}
         <a href="{% url 'create_news' %}" class="btn btn-primary">Создать новость</a>
     {% endif %}
+
+    <!-- Выбор сортировки -->
+    <div class="sort-by">
+        <label for="sort_by">Сортировать по:</label>
+        <select id="sort_by" name="sort_by" onchange="location = this.value;">
+            <option value="?sort_by=-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Сначала новые</option>
+            <option value="?sort_by=created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Сначала старые</option>
+        </select>
+    </div>
+
     <div class="news-list">
         {% for news in news_list %}
             <div class="news-block">

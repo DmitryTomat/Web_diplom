@@ -359,3 +359,21 @@ form {
     background-color: #dc3545; /* Устанавливает цвет фона */
     border-color: #dc3545; /* Устанавливает цвет границы */
 }
+
+/* Стили для выбора сортировки */
+.sort-by {
+    margin-bottom: 20px;
+}
+
+.sort-by label {
+    font-size: 16px;
+    color: #333;
+    margin-right: 10px;
+}
+
+.sort-by select {
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

@@ -287,5 +287,6 @@ def delete_news_view(request, news_id):
     return render(request, 'delete_news.html', {'news': news})
 
 def news_view(request):
-    news_list = News.objects.all().order_by('-created_at')
-    return render(request, 'news.html', {'news_list': news_list})
+    sort_by = request.GET.get('sort_by', '-created_at')  # По умолчанию сортировка по убыванию даты создания
+    news_list = News.objects.all().order_by(sort_by)
+    return render(request, 'news.html', {'news_list': news_list, 'sort_by': sort_by})
