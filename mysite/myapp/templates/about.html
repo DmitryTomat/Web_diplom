@@ -1,8 +1,34 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}О нас{% endblock %}
 
 {% block content %}
-    <h2>О нас</h2>
-    <p>Здесь вы можете узнать больше о нашей компании.</p>
+    <div class="about-container">
+        <h2>О нас</h2>
+        <p>Мы — разработчики <strong>PipeAri</strong>. Наш сервис был организован в июле 2024 года с целью помощи компаниям исследовать трубопроводные системы на наличие дефектов и их последующего устранения.</p>
+
+        <h3>Наша миссия</h3>
+        <p>Мы стремимся сделать процесс диагностики и обслуживания трубопроводов более эффективным и безопасным. Наши решения помогают компаниям своевременно выявлять проблемы и минимизировать риски.</p>
+
+        <h3>Контакты</h3>
+        <p>Если у вас есть вопросы или вы хотите обсудить сотрудничество, свяжитесь с нами:</p>
+        <ul class="contact-list">
+            <li>Email: <a href="mailto:pipeari-org@mail.ru">pipeari-org@mail.ru</a></li>
+            <li>Телефон: <a href="tel:+71234567890">+7 (123) 456-78-90</a></li>
+        </ul>
+
+        <h3>Мы в социальных сетях</h3>
+        <div class="social-icons">
+            <a href="https://vk.com/pipeari" target="_blank">
+                <img src="{% static 'vk_icon.svg' %}" alt="ВКонтакте">
+            </a>
+            <a href="https://t.me/pipeari" target="_blank">
+                <img src="{% static 'tg_icon.svg' %}" alt="Телеграм">
+            </a>
+            <a href="https://wa.me/71234567890" target="_blank">
+                <img src="{% static 'whatsup_icon.svg' %}" alt="WhatsApp">
+            </a>
+        </div>
+    </div>
 {% endblock %}
