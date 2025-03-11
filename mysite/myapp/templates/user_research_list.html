@@ -3,23 +3,25 @@
 {% block title %}Исследования пользователя {{ user.username }}{% endblock %}
 
 {% block content %}
-    <h2>Исследования пользователя {{ user.username }}</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Название</th>
-                <th>Описание</th>
-                <th>Дата создания</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for research in researches %}
+    <div class="research-list-container">
+        <h2>Исследования пользователя {{ user.username }}</h2>
+        <table class="research-table">
+            <thead>
                 <tr>
-                    <td>{{ research.title }}</td>
-                    <td>{{ research.description }}</td>
-                    <td>{{ research.created_at|date:"d.m.Y H:i" }}</td>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Дата создания</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for research in researches %}
+                    <tr>
+                        <td>{{ research.title }}</td>
+                        <td>{{ research.description }}</td>
+                        <td>{{ research.created_at|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
