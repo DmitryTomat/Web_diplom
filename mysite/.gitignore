@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Database
+*.sql
+*.sqlite3
+
+# Static files (если они генерируются автоматически)
+staticfiles/
+
+# IDE
+.idea/
+.vscode/
+
+# Environments
+.env
+venv/
