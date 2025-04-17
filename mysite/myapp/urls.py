@@ -3,6 +3,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include
+from .views import api_login, api_register
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
@@ -33,4 +34,6 @@ urlpatterns = [
     path('news/delete/<int:news_id>/', views.delete_news_view, name='delete_news'),
     path('news/<int:news_id>/', views.news_detail_view, name='news_detail'),
     path('api/', include('myapp.api.urls')),  # Подключение API
+    path('api/login/', api_login, name='api_login'),
+    path('api/register/', api_register, name='api_register'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -294,3 +294,72 @@ def news_view(request):
 def news_detail_view(request, news_id):
     news = get_object_or_404(News, id=news_id)
     return render(request, 'news_detail.html', {'news': news})
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from .forms import LoginForm, RegistrationForm
+import json
+
+@api_view(['POST'])
+@permission_classes([])
+def api_login(request):
+    try:
+        data = json.loads(request.body)
+        form = LoginForm(data)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                return Response({
+                    'status': 'success',
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email
+                    }
+                })
+            return Response({
+                'status': 'error',
+                'message': 'Invalid credentials'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({
+            'status': 'error',
+            'errors': form.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([])
+def api_register(request):
+    try:
+        data = json.loads(request.body)
+        form = RegistrationForm(data)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return Response({
+                'status': 'success',
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email
+                }
+            })
+        return Response({
+            'status': 'error',
+            'errors': form.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
