@@ -1,28 +1,35 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from django.http import JsonResponse
 from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
-@api_view(['POST'])
+@csrf_exempt
 def api_login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            password = data.get('password')
 
-    # Проверка учетных данных через стандартную систему аутентификации Django
-    user = authenticate(username=username, password=password)
-
-    if user:
-        # Создаем или получаем токен пользователя
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({
-            'status': 'success',
-            'token': token.key,
-            'user_id': user.id,
-            'username': user.username
-        })
-    else:
-        return Response({
-            'status': 'error',
-            'message': 'Invalid credentials'
-        }, status=400)
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                return JsonResponse({
+                    'status': 'success',
+                    'token': 'dummy_token',  # В реальном приложении используйте JWT или другой механизм
+                    'username': user.username
+                })
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': 'Invalid credentials'
+                }, status=401)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'error': str(e)
+            }, status=400)
+    return JsonResponse({
+        'status': 'error',
+        'error': 'Method not allowed'
+    }, status=405)
