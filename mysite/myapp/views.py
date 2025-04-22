@@ -325,4 +325,6 @@ def api_login(request):
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
-    return JsonResponse({"status": "error", "message": "Only POST method allowed"}, status=405)
+        return JsonResponse({"status": "test"})
+
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
