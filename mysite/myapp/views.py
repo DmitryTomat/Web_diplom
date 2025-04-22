@@ -294,3 +294,35 @@ def news_view(request):
 def news_detail_view(request, news_id):
     news = get_object_or_404(News, id=news_id)
     return render(request, 'news_detail.html', {'news': news})
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import authenticate
+import json
+
+
+@csrf_exempt  # Отключает CSRF для API (для теста, потом замените на JWT)
+def api_login(request):
+    if request.method == "POST":
+        try:
+            # Парсим JSON из тела запроса
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
+
+            # Проверяем логин/пароль
+            user = authenticate(username=username, password=password)
+            if user:
+                return JsonResponse({
+                    "status": "success",
+                    "user_id": user.id,
+                    "username": user.username,
+                })
+            else:
+                return JsonResponse({"status": "error", "message": "Invalid credentials"}, status=401)
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+    return JsonResponse({"status": "error", "message": "Only POST method allowed"}, status=405)

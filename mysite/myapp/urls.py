@@ -33,4 +33,5 @@ urlpatterns = [
     path('news/delete/<int:news_id>/', views.delete_news_view, name='delete_news'),
     path('news/<int:news_id>/', views.news_detail_view, name='news_detail'),
     path('api/', include('myapp.api.urls')),
+    path('api/login/', views.api_login, name='api_login'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
