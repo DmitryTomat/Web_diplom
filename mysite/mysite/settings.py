@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'myapp',
     'rest_framework',
     'rest_framework.authtoken',  # Для токенов
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -51,14 +52,25 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',  # Аутентификация по токену
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ],
+}
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# Настройки JWT
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
 TEMPLATES = [
@@ -86,11 +98,14 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'PipeAri',  # Имя вашей базы данных
-        'USER': 'root',  # Имя пользователя базы данных
-        'PASSWORD': '1357908642',  # Пароль пользователя базы данных
-        'HOST': 'localhost',  # Хост базы данных
-        'PORT': '3306',  # Порт базы данных
+        'NAME': 'turyatkodmitry$default',  # Имя вашей БД (из PythonAnywhere Databases)
+        'USER': 'turyatkodmitry',             # Ваш username на PythonAnywhere
+        'PASSWORD': 'k0m1_1357908642',       # Пароль от БД (не от аккаунта!)
+        'HOST': 'turyatkodmitry.mysql.pythonanywhere-services.com',  # Хост из PythonAnywhere
+        'PORT': '3306',                       # Стандартный порт MySQL
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
