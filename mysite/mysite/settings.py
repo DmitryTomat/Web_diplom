@@ -65,6 +65,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_METHODS = ['POST', 'OPTIONS']
 
 # Настройки JWT
 from datetime import timedelta
@@ -157,3 +158,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_SECURE = True  # Для HTTPS
+SESSION_COOKIE_HTTPONLY = True

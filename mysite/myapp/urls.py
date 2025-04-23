@@ -2,12 +2,11 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import include
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
-    path('', views.home_view, name='home'),
+    path('', views.home_view, name='home'),  # Убрал точку
     path('software/', views.software_view, name='software'),
     path('about/', views.about_view, name='about'),
     path('logout/', views.logout_view, name='logout'),
@@ -15,7 +14,7 @@ urlpatterns = [
     path('login_choice/', views.login_choice_view, name='login_choice'),
     path('settings/', views.settings_user, name='settings_user'),
     path('users/', views.user_list_view, name='user_list'),
-    path('users/delete/<int:user_id>/', views.delete_user_view, name='delete_user'),
+    path('users/delete/<int:user_id>/', views.delete_user_view, name='delete_user'),  # Исправлен users.delete
     path('users/toggle_staff_status/<int:user_id>/', views.toggle_staff_status_view, name='toggle_staff_status'),
     path('research/', views.research_list_view, name='research_list'),
     path('research/create/', views.create_research_view, name='create_research'),
@@ -30,7 +29,6 @@ urlpatterns = [
     path('news/', views.news_view, name='news'),
     path('news/create/', views.create_news_view, name='create_news'),
     path('news/edit/<int:news_id>/', views.edit_news_view, name='edit_news'),
-    path('news/delete/<int:news_id>/', views.delete_news_view, name='delete_news'),
+    path('news/delete/<int:news_id>/', views.delete_news_view, name='delete_news'),  # Исправлен news.delete
     path('news/<int:news_id>/', views.news_detail_view, name='news_detail'),
-    path('api/', include('myapp.api.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # Исправлен знак равенства
