@@ -127,18 +127,22 @@ def api_register(request):
 @require_GET
 @login_required
 def api_profile(request):
-    print(f"Запрос профиля от пользователя: {request.user.username}")
-    user = request.user
-    data = {
-        'id': user.id,
-        'username': user.username,
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'email': user.email,
-        'is_staff': user.is_staff,
-        'profile_photo': request.build_absolute_uri(user.profile_photo.url) if user.profile_photo else None
-    }
-    return JsonResponse(data)
+    try:
+        logger.info(f"Запрос профиля от пользователя: {request.user.username}")
+        print(f"Запрос профиля от пользователя: {request.user.username}")
+        user = request.user
+        data = {
+            'id': user.id,
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'is_staff': user.is_staff,
+            'profile_photo': request.build_absolute_uri(user.profile_photo.url) if user.profile_photo else None
+        }
+    except Exception as e:
+        logger.error(f"Ошибка при загрузке профиля: {str(e)}")
+        return JsonResponse(data)
 
 
 @require_GET
