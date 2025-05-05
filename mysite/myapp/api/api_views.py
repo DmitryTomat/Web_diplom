@@ -122,35 +122,35 @@ def api_register(request):
 
 @csrf_exempt
 def api_profile(request):
-    if request.method == 'GET':
-        # Получаем токен из заголовков
-        auth_header = request.headers.get('Authorization', '')
-        if not auth_header.startswith('Token '):
-            return JsonResponse({'status': 'error', 'error': 'Invalid auth header'}, status=401)
+    if request.method != 'GET':
+        return JsonResponse({'status': 'error', 'error': 'Only GET method allowed'}, status=405)
 
-        token = auth_header.split(' ')[1]
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Token '):
+        return JsonResponse({'status': 'error', 'error': 'Auth header missing or invalid'}, status=401)
 
-        # Проверяем токен (в реальном приложении используйте JWT)
-        from django.contrib.sessions.models import Session
-        try:
-            session = Session.objects.get(session_key=token)
-            user_id = session.get_decoded().get('_auth_user_id')
-            user = User.objects.get(id=user_id)
+    token = auth_header.split(' ')[1].strip()
 
-            # Возвращаем данные профиля
-            profile_data = {
-                'status': 'success',
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'is_staff': user.is_staff
-            }
-            return JsonResponse(profile_data)
+    try:
+        session = Session.objects.get(session_key=token)
+        user_id = session.get_decoded().get('_auth_user_id')
+        user = User.objects.get(id=user_id)
 
-        except Session.DoesNotExist:
-            return JsonResponse({'status': 'error', 'error': 'Invalid token'}, status=401)
-        except User.DoesNotExist:
-            return JsonResponse({'status': 'error', 'error': 'User not found'}, status=404)
+        profile_data = {
+            'status': 'success',
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name or '',
+            'last_name': user.last_name or '',
+            'is_staff': user.is_staff
+        }
 
-    return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
+        # Удаляем проверку profile_photo, так как её нет в стандартной модели User
+        return JsonResponse(profile_data)
+
+    except Session.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'Session expired or invalid'}, status=401)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
