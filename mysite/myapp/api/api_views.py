@@ -4,6 +4,8 @@ import logging
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -116,3 +118,47 @@ def api_register(request):
         'status': 'error',
         'error': 'Method not allowed'
     }, status=405)
+
+
+@csrf_exempt
+def api_profile(request):
+    if request.method == 'GET':
+        # Получение профиля
+        token = request.headers.get('Authorization', '').split(' ')[-1]
+        try:
+            session = Session.objects.get(session_key=token)
+            user_id = session.get_decoded().get('_auth_user_id')
+            user = User.objects.get(id=user_id)
+
+            return JsonResponse({
+                'status': 'success',
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'is_staff': user.is_staff,
+                'profile_photo': user.profile_photo.url if user.profile_photo else None
+            })
+        except (Session.DoesNotExist, User.DoesNotExist):
+            return JsonResponse({'status': 'error', 'error': 'Invalid token'}, status=401)
+
+    elif request.method == 'POST':
+        # Обновление профиля
+        token = request.headers.get('Authorization', '').split(' ')[-1]
+        try:
+            session = Session.objects.get(session_key=token)
+            user_id = session.get_decoded().get('_auth_user_id')
+            user = User.objects.get(id=user_id)
+
+            data = json.loads(request.body)
+            user.username = data.get('username', user.username)
+            user.email = data.get('email', user.email)
+            user.first_name = data.get('first_name', user.first_name)
+            user.last_name = data.get('last_name', user.last_name)
+            user.save()
+
+            return JsonResponse({'status': 'success'})
+        except (Session.DoesNotExist, User.DoesNotExist):
+            return JsonResponse({'status': 'error', 'error': 'Invalid token'}, status=401)
+
+    return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
