@@ -127,7 +127,7 @@ def api_register(request):
 @require_GET
 @login_required
 def api_profile(request):
-    print(f"Запрос профиля от пользователя: {request.user.username}")
+    """Получение данных профиля текущего пользователя"""
     user = request.user
     data = {
         'id': user.id,
@@ -136,6 +136,9 @@ def api_profile(request):
         'last_name': user.last_name,
         'email': user.email,
         'is_staff': user.is_staff,
+        'is_superuser': user.is_superuser,
+        'date_joined': user.date_joined,
+        'last_login': user.last_login,
         'profile_photo': request.build_absolute_uri(user.profile_photo.url) if user.profile_photo else None
     }
     return JsonResponse(data)
@@ -230,19 +233,3 @@ def api_user_detail(request, user_id):
         'profile_photo': request.build_absolute_uri(user.profile_photo.url) if user.profile_photo else None
     }
     return JsonResponse(data)
-
-@csrf_exempt
-@login_required
-def api_update_profile(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            user = request.user
-            user.first_name = data.get('first_name', user.first_name)
-            user.last_name = data.get('last_name', user.last_name)
-            user.email = data.get('email', user.email)
-            user.save()
-            return JsonResponse({'status': 'success'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'error': str(e)}, status=400)
-    return JsonResponse({'error': 'Only POST allowed'}, status=405)

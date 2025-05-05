@@ -9,5 +9,4 @@ urlpatterns = [
     path('researches/', api_views.api_researches, name='api_researches'),
     path('users/<int:user_id>/', api_views.api_user_detail, name='api_user_detail'),
     path('researches/<int:research_id>/', api_views.api_research_detail, name='api_research_detail'),
-    path('profile/update/', api_views.api_update_profile, name='api_update_profile'),
 ]
