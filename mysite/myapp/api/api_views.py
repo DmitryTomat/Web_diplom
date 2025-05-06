@@ -154,3 +154,44 @@ def api_profile(request):
         return JsonResponse({'status': 'error', 'error': 'User not found'}, status=404)
     except Exception as e:
         return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_update_profile(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'error': 'Only POST method allowed'}, status=405)
+
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Token '):
+        return JsonResponse({'status': 'error', 'error': 'Auth header missing or invalid'}, status=401)
+
+    token = auth_header.split(' ')[1].strip()
+
+    try:
+        session = Session.objects.get(session_key=token)
+        user_id = session.get_decoded().get('_auth_user_id')
+        user = User.objects.get(id=user_id)
+
+        data = json.loads(request.body)
+
+        # Обновляем только те поля, которые пришли в запросе
+        if 'first_name' in data:
+            user.first_name = data['first_name']
+        if 'last_name' in data:
+            user.last_name = data['last_name']
+        if 'email' in data:
+            user.email = data['email']
+
+        user.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Profile updated successfully'
+        })
+
+    except Session.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'Session expired or invalid'}, status=401)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=400)
