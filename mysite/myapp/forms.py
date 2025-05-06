@@ -48,10 +48,24 @@ class ResearchFileForm(forms.ModelForm):
         model = ResearchFile
         fields = ['file', 'description']
 
+
 class DefectForm(forms.ModelForm):
     class Meta:
         model = Defect
-        fields = ['research', 'defect_date', 'defect_name', 'defect_description', 'defect_coordinates']
+        fields = ['research', 'defect_date', 'defect_name', 'defect_description', 'defect_coordinates', 'defect_type']
+        widgets = {
+            'defect_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+    def clean_defect_coordinates(self):
+        coordinates = self.cleaned_data.get('defect_coordinates')
+        try:
+            lat, lon = map(str.strip, coordinates.split(','))
+            float(lat)
+            float(lon)
+            return coordinates
+        except (ValueError, AttributeError):
+            raise forms.ValidationError('Введите координаты в формате "широта, долгота" (числовые значения)')
 
 class XMLUploadForm(forms.Form):
     xml_file = forms.FileField(

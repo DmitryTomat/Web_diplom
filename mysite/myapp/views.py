@@ -238,7 +238,15 @@ def upload_xml_view(request):
                 defects_elem = root.find('.//Дефекты/pictures')
                 if defects_elem is not None:
                     for defect_elem in defects_elem:
-                        # Получаем данные о дефекте
+                        # Получаем координаты из элемента picture
+                        picture_elem = defect_elem.find('picture')
+                        coordinates = '0, 0'  # Значение по умолчанию
+                        if picture_elem is not None:
+                            lat = picture_elem.attrib.get('latitude', '0')
+                            lon = picture_elem.attrib.get('longitude', '0')
+                            coordinates = f"{lat}, {lon}"
+
+                        # Получаем описание дефекта
                         description_elem = defect_elem.find('description')
                         if description_elem is not None:
                             defect_name = description_elem.findtext('defectText', 'Неизвестный дефект')
@@ -250,7 +258,7 @@ def upload_xml_view(request):
                                 defect_date=research.created_at,
                                 defect_name=defect_name,
                                 defect_description=defect_description,
-                                defect_coordinates='0, 0',  # Координаты не указаны в XML
+                                defect_coordinates=coordinates,
                                 defect_type=defect_type
                             )
 

@@ -1,5 +1,6 @@
 from datetime import timezone
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -30,6 +31,18 @@ class Defect(models.Model):
     defect_description = models.TextField()
     defect_coordinates = models.CharField(max_length=255)
     defect_type = models.CharField(max_length=255)  # Добавляем поле для типа дефекта
+
+    def clean(self):
+        super().clean()
+        # Проверяем формат координат
+        try:
+            parts = self.defect_coordinates.split(',')
+            if len(parts) != 2:
+                raise ValidationError('Координаты должны быть в формате "широта, долгота"')
+            float(parts[0].strip())  # Проверяем, что широта - число
+            float(parts[1].strip())  # Проверяем, что долгота - число
+        except ValueError:
+            raise ValidationError('Координаты должны быть числовыми значениями')
 
     @classmethod
     def create_from_xml(cls, research, defect_data):
