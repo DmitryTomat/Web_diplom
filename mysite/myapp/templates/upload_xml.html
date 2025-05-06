@@ -4,10 +4,17 @@
 
 {% block content %}
     <h2>Загрузить XML-файл</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Загрузить</button>
+        <button type="submit" class="btn btn-primary">Загрузить</button>
     </form>
-    <a href="{% url 'research_list' %}">Назад к списку исследований</a>
+    <a href="{% url 'research_list' %}" class="btn btn-secondary mt-3">Назад к списку исследований</a>
 {% endblock %}

@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -28,6 +30,18 @@ class Defect(models.Model):
     defect_description = models.TextField()
     defect_coordinates = models.CharField(max_length=255)
     defect_type = models.CharField(max_length=255)  # Добавляем поле для типа дефекта
+
+    @classmethod
+    def create_from_xml(cls, research, defect_data):
+        """Создает дефект из данных XML"""
+        return cls.objects.create(
+            research=research,
+            defect_date=timezone.now(),
+            defect_name=defect_data.get('defect_name', 'Неизвестный дефект'),
+            defect_description=defect_data.get('defect_description', ''),
+            defect_coordinates=defect_data.get('defect_coordinates', '0, 0'),
+            defect_type=defect_data.get('defect_type', 'Неизвестный тип')
+        )
 
     def __str__(self):
         return f"{self.defect_name} - {self.research.title}"

@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.core.validators import FileExtensionValidator
+
 from .models import Research, ResearchFile
 from .models import Defect
 from .models import News
@@ -52,7 +54,11 @@ class DefectForm(forms.ModelForm):
         fields = ['research', 'defect_date', 'defect_name', 'defect_description', 'defect_coordinates']
 
 class XMLUploadForm(forms.Form):
-    xml_file = forms.FileField()
+    xml_file = forms.FileField(
+        label='XML файл',
+        help_text='Загрузите XML файл с данными исследования',
+        validators=[FileExtensionValidator(allowed_extensions=['xml'])]
+    )
 
 class NewsForm(forms.ModelForm):
     class Meta:
