@@ -1,3 +1,6 @@
+from datetime import timezone
+
+from collada.xmlutil import ET
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
 import logging
@@ -348,5 +351,83 @@ def api_delete_defect(request, defect_id):
 
     except Defect.DoesNotExist:
         return JsonResponse({'status': 'error', 'error': 'Defect not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_upload_research(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'error': 'Only POST method allowed'}, status=405)
+
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Token '):
+        return JsonResponse({'status': 'error', 'error': 'Auth header missing or invalid'}, status=401)
+
+    token = auth_header.split(' ')[1].strip()
+
+    try:
+        session = Session.objects.get(session_key=token)
+        user_id = session.get_decoded().get('_auth_user_id')
+        user = User.objects.get(id=user_id)
+
+        research_name = request.POST.get('research_name', 'Новое исследование')
+
+        # Создаем новое исследование
+        research = Research.objects.create(
+            user=user,
+            title=research_name,
+            description='Исследование загружено из мобильного приложения'
+        )
+
+        # Обрабатываем XML файл с дефектами
+        if 'xml_file' in request.FILES:
+            xml_file = request.FILES['xml_file']
+            tree = ET.parse(xml_file)
+            root = tree.getroot()
+
+            # Ищем раздел с дефектами
+            defects_elem = root.find('.//Дефекты/pictures')
+            if defects_elem is not None:
+                for defect_elem in defects_elem:
+                    # Получаем координаты из элемента picture
+                    picture_elem = defect_elem.find('picture')
+                    coordinates = '0, 0'  # Значение по умолчанию
+                    if picture_elem is not None:
+                        lat = picture_elem.attrib.get('latitude', '0')
+                        lon = picture_elem.attrib.get('longitude', '0')
+                        coordinates = f"{lat}, {lon}"
+
+                    # Получаем описание дефекта
+                    description_elem = defect_elem.find('description')
+                    if description_elem is not None:
+                        defect_name = description_elem.findtext('defectText', 'Неизвестный дефект')
+                        defect_description = description_elem.findtext('lengthDefect', '')
+                        defect_type = description_elem.findtext('defectType', 'Неизвестный тип')
+
+                        Defect.objects.create(
+                            research=research,
+                            defect_date=timezone.now(),
+                            defect_name=defect_name,
+                            defect_description=defect_description,
+                            defect_coordinates=coordinates,
+                            defect_type=defect_type
+                        )
+
+        # Сохраняем KML файл
+        if 'kml_file' in request.FILES:
+            kml_file = request.FILES['kml_file']
+            research.kml_file.save(f'route_{research.id}.kml', kml_file)
+
+        return JsonResponse({
+            'status': 'success',
+            'research_id': research.id,
+            'message': 'Research uploaded successfully'
+        })
+
+    except Session.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'Session expired or invalid'}, status=401)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'User not found'}, status=404)
     except Exception as e:
         return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
