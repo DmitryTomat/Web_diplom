@@ -214,41 +214,53 @@ def add_defect_view(request, research_id):
         form = DefectForm(initial={'research': research})
     return render(request, 'add_defect.html', {'form': form, 'research': research})
 
+
 @login_required
 def upload_xml_view(request):
     if request.method == 'POST':
         form = XMLUploadForm(request.POST, request.FILES)
         if form.is_valid():
             xml_file = request.FILES['xml_file']
-            tree = ET.parse(xml_file)
-            root = tree.getroot()
+            try:
+                tree = ET.parse(xml_file)
+                root = tree.getroot()
 
-            # Создаем новое исследование
-            research = Research.objects.create(
-                user=request.user,
-                title=root.attrib['name'],
-                description='',
-                image=None,
-                kml_file=None
-            )
+                # Создаем новое исследование
+                research = Research.objects.create(
+                    user=request.user,
+                    title=root.attrib.get('name', 'Новое исследование'),
+                    description='',
+                    image=None,
+                    kml_file=None
+                )
 
-            # Обрабатываем дефекты
-            defects_elem = root.find('.//Дефекты/pictures')
-            if defects_elem is not None:
-                for defect_elem in defects_elem:
-                    picture_elem = defect_elem.find('picture')
-                    description_elem = defect_elem.find('description')
+                # Ищем раздел с дефектами
+                defects_elem = root.find('.//Дефекты/pictures')
+                if defects_elem is not None:
+                    for defect_elem in defects_elem:
+                        # Получаем данные о дефекте
+                        description_elem = defect_elem.find('description')
+                        if description_elem is not None:
+                            defect_name = description_elem.findtext('defectText', 'Неизвестный дефект')
+                            defect_description = description_elem.findtext('lengthDefect', '')
+                            defect_type = description_elem.findtext('defectType', 'Неизвестный тип')
 
-                    defect = Defect.objects.create(
-                        research=research,
-                        defect_date=research.created_at,
-                        defect_name=description_elem.find('defectText').text,
-                        defect_description=description_elem.find('lengthDefect').text,
-                        defect_coordinates=f"{picture_elem.attrib['latitude']}, {picture_elem.attrib['longitude']}",
-                        defect_type=description_elem.find('defectType').text
-                    )
+                            Defect.objects.create(
+                                research=research,
+                                defect_date=research.created_at,
+                                defect_name=defect_name,
+                                defect_description=defect_description,
+                                defect_coordinates='0, 0',  # Координаты не указаны в XML
+                                defect_type=defect_type
+                            )
 
-            return redirect('research_detail', research_id=research.id)
+                messages.success(request, 'Файл успешно загружен и обработан.')
+                return redirect('research_detail', research_id=research.id)
+
+            except ET.ParseError as e:
+                messages.error(request, f'Ошибка парсинга XML: {str(e)}')
+            except Exception as e:
+                messages.error(request, f'Ошибка обработки файла: {str(e)}')
     else:
         form = XMLUploadForm()
     return render(request, 'upload_xml.html', {'form': form})
