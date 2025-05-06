@@ -1,3 +1,6 @@
+from datetime import timezone
+
+import xml.etree.ElementTree as ET
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
 import logging
@@ -350,3 +353,103 @@ def api_delete_defect(request, defect_id):
         return JsonResponse({'status': 'error', 'error': 'Defect not found'}, status=404)
     except Exception as e:
         return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_upload_research(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
+
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Token '):
+        return JsonResponse({'status': 'error', 'error': 'Auth header missing or invalid'}, status=401)
+
+    token = auth_header.split(' ')[1].strip()
+
+    try:
+        session = Session.objects.get(session_key=token)
+        user_id = session.get_decoded().get('_auth_user_id')
+        user = User.objects.get(id=user_id)
+
+        data = json.loads(request.body)
+        title = data.get('title')
+        description = data.get('description')
+        kml_content = data.get('kml_content', '')
+        xml_content = data.get('xml_content', '')
+
+        if not title or not description:
+            return JsonResponse({'status': 'error', 'error': 'Title and description are required'}, status=400)
+
+        # Создаем исследование
+        research = Research.objects.create(
+            user=user,
+            title=title,
+            description=description
+        )
+
+        # Обрабатываем KML файл
+        if kml_content:
+            from django.core.files.base import ContentFile
+            research.kml_file.save(
+                f'research_{research.id}.kml',
+                ContentFile(kml_content.encode('utf-8'))
+            )
+            research.save()
+
+        # Обрабатываем XML с дефектами
+        if xml_content:
+            parse_xml_defects(xml_content, research)
+
+        return JsonResponse({
+            'status': 'success',
+            'research_id': research.id,
+            'message': 'Research uploaded successfully'
+        })
+
+    except Session.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'Session expired or invalid'}, status=401)
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'User not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'error': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        logger.error(f"Error in api_upload_research: {str(e)}")
+        return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
+
+
+def parse_xml_defects(xml_content, research):
+    try:
+        # Парсим XML и создаем дефекты
+        root = ET.fromstring(xml_content)
+
+        # Находим все дефекты (адаптируйте в зависимости от структуры вашего XML)
+        for defect_elem in root.findall('.//Defect'):
+            defect_text = defect_elem.find('defectText').text if defect_elem.find('defectText') is not None else ''
+            length_defect = defect_elem.find('lengthDefect').text if defect_elem.find(
+                'lengthDefect') is not None else ''
+            defect_type = defect_elem.find('defectType').text if defect_elem.find('defectType') is not None else ''
+
+            # Координаты могут быть в разных местах в зависимости от структуры XML
+            latitude = defect_elem.find('latitude').text if defect_elem.find('latitude') is not None else '0'
+            longitude = defect_elem.find('longitude').text if defect_elem.find('longitude') is not None else '0'
+
+            defect = Defect.objects.create(
+                research=research,
+                defect_name=defect_text,
+                defect_description=length_defect,
+                defect_type=defect_type,
+                defect_coordinates=f"{latitude},{longitude}"
+            )
+
+            # Обработка фотографий, если они есть
+            for photo_elem in defect_elem.findall('picture'):
+                photo_path = photo_elem.text if photo_elem.text else ''
+                # Здесь можно добавить обработку загрузки фотографий
+                if photo_path:
+                    # Логика загрузки фото
+                    pass
+
+    except ET.ParseError as e:
+        logger.error(f"XML parsing error: {str(e)}")
+    except Exception as e:
+        logger.error(f"Error parsing XML defects: {str(e)}")

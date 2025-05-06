@@ -9,4 +9,5 @@ urlpatterns = [
     path('research/', api_views.api_research_list, name='api_research_list'),
     path('research/<int:research_id>/', api_views.api_research_detail, name='api_research_detail'),
     path('defect/<int:defect_id>/', api_views.api_delete_defect, name='api_delete_defect'),
+    path('research/upload/', api_views.api_upload_research, name='api_upload_research'),
 ]
