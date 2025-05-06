@@ -7,7 +7,7 @@ import json
 from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
 
-from ..models import Research
+from ..models import Research, Defect, ResearchFile
 
 logger = logging.getLogger(__name__)
 
@@ -244,8 +244,88 @@ def api_research_list(request):
 # myapp/api/api_views.py
 @csrf_exempt
 def api_research_detail(request, research_id):
-    if request.method != 'GET':
-        return JsonResponse({'status': 'error', 'error': 'Only GET method allowed'}, status=405)
+    if request.method == 'GET':
+        # Получение деталей исследования
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Token '):
+            return JsonResponse({'status': 'error', 'error': 'Auth header missing or invalid'}, status=401)
+
+        token = auth_header.split(' ')[1].strip()
+
+        try:
+            session = Session.objects.get(session_key=token)
+            user_id = session.get_decoded().get('_auth_user_id')
+            user = User.objects.get(id=user_id)
+
+            research = Research.objects.get(id=research_id, user=user)
+            files = ResearchFile.objects.filter(research=research)
+            defects = Defect.objects.filter(research=research)
+
+            research_data = {
+                'id': research.id,
+                'title': research.title,
+                'description': research.description,
+                'created_at': research.created_at.strftime("%d.%m.%Y %H:%M"),
+                'files': [{
+                    'id': file.id,
+                    'name': file.file.name,
+                    'url': file.file.url,
+                    'description': file.description or ''
+                } for file in files],
+                'defects': [{
+                    'id': defect.id,
+                    'name': defect.defect_name,
+                    'description': defect.defect_description,
+                    'date': defect.defect_date.strftime("%d.%m.%Y %H:%M"),
+                    'coordinates': defect.defect_coordinates,
+                    'type': defect.defect_type
+                } for defect in defects]
+            }
+
+            return JsonResponse({
+                'status': 'success',
+                'research': research_data
+            })
+
+        except Research.DoesNotExist:
+            return JsonResponse({'status': 'error', 'error': 'Research not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
+
+    elif request.method == 'DELETE':
+        # Удаление исследования
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Token '):
+            return JsonResponse({'status': 'error', 'error': 'Auth header missing or invalid'}, status=401)
+
+        token = auth_header.split(' ')[1].strip()
+
+        try:
+            session = Session.objects.get(session_key=token)
+            user_id = session.get_decoded().get('_auth_user_id')
+            user = User.objects.get(id=user_id)
+
+            research = Research.objects.get(id=research_id, user=user)
+            research.delete()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Research deleted successfully'
+            })
+
+        except Research.DoesNotExist:
+            return JsonResponse({'status': 'error', 'error': 'Research not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
+
+    else:
+        return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def api_delete_defect(request, defect_id):
+    if request.method != 'DELETE':
+        return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
 
     auth_header = request.headers.get('Authorization', '')
     if not auth_header.startswith('Token '):
@@ -258,27 +338,15 @@ def api_research_detail(request, research_id):
         user_id = session.get_decoded().get('_auth_user_id')
         user = User.objects.get(id=user_id)
 
-        research = Research.objects.get(id=research_id, user=user)
-
-        research_data = {
-            'id': research.id,
-            'title': research.title,
-            'description': research.description,
-            'created_at': research.created_at.strftime("%d.%m.%Y %H:%M"),
-            'image_url': research.image.url if research.image else None,
-            'kml_file_url': research.kml_file.url if research.kml_file else None
-        }
+        defect = Defect.objects.get(id=defect_id, research__user=user)
+        defect.delete()
 
         return JsonResponse({
             'status': 'success',
-            'research': research_data
+            'message': 'Defect deleted successfully'
         })
 
-    except Research.DoesNotExist:
-        return JsonResponse({'status': 'error', 'error': 'Research not found'}, status=404)
-    except Session.DoesNotExist:
-        return JsonResponse({'status': 'error', 'error': 'Session expired or invalid'}, status=401)
-    except User.DoesNotExist:
-        return JsonResponse({'status': 'error', 'error': 'User not found'}, status=404)
+    except Defect.DoesNotExist:
+        return JsonResponse({'status': 'error', 'error': 'Defect not found'}, status=404)
     except Exception as e:
         return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
