@@ -357,7 +357,7 @@ def api_delete_defect(request, defect_id):
 @csrf_exempt
 def api_upload_research(request):
     if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
+        return JsonResponse({'status': 'error', 'error': 'Only POST method allowed'}, status=405)
 
     auth_header = request.headers.get('Authorization', '')
     if not auth_header.startswith('Token '):
@@ -452,3 +452,14 @@ def parse_xml_defects(xml_content, research):
         logger.error(f"XML parsing error: {str(e)}")
     except Exception as e:
         logger.error(f"Error parsing XML defects: {str(e)}")
+
+@csrf_exempt
+def api_research(request):
+    if request.method == 'POST':
+        # Обработка создания нового исследования
+        return api_upload_research(request)
+    elif request.method == 'GET':
+        # Обработка получения списка исследований
+        return api_research_list(request)
+    else:
+        return JsonResponse({'status': 'error', 'error': 'Method not allowed'}, status=405)
