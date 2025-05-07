@@ -373,11 +373,14 @@ def api_upload_research(request):
         data = json.loads(request.body)
         title = data.get('title')
         description = data.get('description')
-        kml_content = data.get('kml_content', '')
-        xml_content = data.get('xml_content', '')
+        defects = data.get('defects', [])
 
+        # Проверка обязательных полей
         if not title or not description:
-            return JsonResponse({'status': 'error', 'error': 'Title and description are required'}, status=400)
+            return JsonResponse(
+                {'status': 'error', 'error': 'Title and description are required'},
+                status=400
+            )
 
         # Создаем исследование
         research = Research.objects.create(
@@ -386,23 +389,33 @@ def api_upload_research(request):
             description=description
         )
 
-        # Обрабатываем KML файл
-        if kml_content:
-            from django.core.files.base import ContentFile
-            research.kml_file.save(
-                f'research_{research.id}.kml',
-                ContentFile(kml_content.encode('utf-8'))
-            )
-            research.save()
+        # Сохраняем дефекты
+        defects_count = 0
+        for defect_data in defects:
+            try:
+                # Проверяем наличие координат
+                lat = defect_data.get('latitude', '0')
+                lon = defect_data.get('longitude', '0')
+                if not lat or not lon:
+                    continue
 
-        # Обрабатываем XML с дефектами
-        if xml_content:
-            parse_xml_defects(xml_content, research)
+                Defect.objects.create(
+                    research=research,
+                    defect_name=defect_data.get('name', ''),
+                    defect_description=defect_data.get('description', ''),
+                    defect_type=defect_data.get('type', ''),
+                    defect_coordinates=f"{lat},{lon}",
+                    defect_date=timezone.now()
+                )
+                defects_count += 1
+            except Exception as e:
+                logger.error(f"Error creating defect: {str(e)}")
 
         return JsonResponse({
             'status': 'success',
             'research_id': research.id,
-            'message': 'Research uploaded successfully'
+            'defects_count': defects_count,
+            'message': f"Research created with {defects_count} defects"
         })
 
     except Session.DoesNotExist:
@@ -412,7 +425,7 @@ def api_upload_research(request):
     except json.JSONDecodeError:
         return JsonResponse({'status': 'error', 'error': 'Invalid JSON data'}, status=400)
     except Exception as e:
-        logger.error(f"Error in api_upload_research: {str(e)}")
+        logger.error(f"Error in research upload: {str(e)}")
         return JsonResponse({'status': 'error', 'error': str(e)}, status=500)
 
 
