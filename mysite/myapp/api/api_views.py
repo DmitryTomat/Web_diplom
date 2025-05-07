@@ -1,6 +1,5 @@
-from datetime import timezone
-
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree as ET
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
 import logging
