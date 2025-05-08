@@ -368,5 +368,5 @@ def view_route(request, research_id):
     return render(request, 'view_route.html', {
         'route': route,
         'coordinates': coordinates,
-        'yandex_maps_api_key': 'ваш_api_ключ'  # Замените на ваш API ключ
+        'yandex_maps_api_key': '37265303-7eff-4755-abb1-3b69b29ecd97'  # Замените на ваш API ключ
     })
