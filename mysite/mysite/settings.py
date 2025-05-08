@@ -141,6 +141,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+YANDEX_MAPS_API_KEY = "1d42f7d2-c1d0-4632-aadf-bcea9ae11d81"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

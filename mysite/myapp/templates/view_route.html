@@ -1,62 +1,78 @@
 {% extends 'base.html' %}
 
-{% block title %}Просмотр маршрута{% endblock %}
+{% block title %}Маршрут исследования - {{ route.research.title }}{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-4">
     <h2>Маршрут исследования: {{ route.research.title }}</h2>
     
     <div id="map" style="width: 100%; height: 500px;"></div>
     
-    <div class="mt-3">
-        <a href="{% url 'research_detail' route.research.id %}" class="btn btn-primary">
-            Вернуться к исследованию
-        </a>
-    </div>
+    <a href="{% url 'research_detail' research_id=route.research.id %}" 
+       class="btn btn-primary mt-3">
+        ← Вернуться к исследованию
+    </a>
 </div>
 
-<script src="https://api-maps.yandex.ru/2.1/?apikey={{ 37265303-7eff-4755-abb1-3b69b29ecd97 }}&lang=ru_RU" type="text/javascript"></script>
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-        // Координаты из Django в формате [lon, lat]
-        const routeCoordinates = [
-            {% for coord in coordinates %}
-                [{{ coord.lon }}, {{ coord.lat }}]{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-        
-        // Инициализация карты
-        ymaps.ready(function() {
+<script src="https://api-maps.yandex.ru/2.1/?apikey={{ yandex_maps_api_key|safe }}&lang=ru_RU"></script>
+
+<script>
+    ymaps.ready(initMap);
+    
+    function initMap() {
+        try {
+            // Convert coordinates to Yandex Maps format [lon, lat]
+            const points = [
+                {% for coord in coordinates %}
+                    [{{ coord.lon }}, {{ coord.lat }}]{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
+            
+            // Create map centered on first point
             const map = new ymaps.Map('map', {
-                center: routeCoordinates[0],
-                zoom: 15,
-                controls: ['zoomControl', 'typeSelector', 'fullscreenControl']
+                center: points.length > 0 ? points[0] : [0, 0],
+                zoom: 14
             });
             
-            // Создаем ломаную линию
-            const routeLine = new ymaps.Polyline(routeCoordinates, {}, {
-                strokeColor: '#0000FF',
+            // Create route line
+            const routeLine = new ymaps.Polyline(points, {
+                strokeColor: "#1e88e5",
                 strokeWidth: 4,
-                strokeOpacity: 0.7
+                strokeOpacity: 0.9
             });
             
-            // Добавляем линию на карту
+            // Add line to map
             map.geoObjects.add(routeLine);
             
-            // Устанавливаем границы карты так, чтобы маршрут был виден целиком
-            map.setBounds(routeLine.geometry.getBounds(), {
-                checkZoomRange: true
-            });
-            
-            // Добавляем точки маршрута
-            routeCoordinates.forEach(function(coord, index) {
-                const placemark = new ymaps.Placemark(coord, {
-                    hintContent: `Точка ${index + 1}`,
-                    balloonContent: `Координаты: ${coord[1]}, ${coord[0]}`
+            // Add markers for start and end points
+            if (points.length > 0) {
+                const startPlacemark = new ymaps.Placemark(points[0], {
+                    hintContent: 'Начало маршрута',
+                    balloonContent: 'Начальная точка'
                 });
-                map.geoObjects.add(placemark);
-            });
-        });
-    });
+                
+                const endPlacemark = new ymaps.Placemark(points[points.length-1], {
+                    hintContent: 'Конец маршрута',
+                    balloonContent: 'Конечная точка'
+                });
+                
+                map.geoObjects.add(startPlacemark);
+                map.geoObjects.add(endPlacemark);
+            }
+            
+            // Adjust map view to show entire route
+            if (points.length > 1) {
+                map.setBounds(routeLine.geometry.getBounds());
+            }
+            
+        } catch (error) {
+            console.error('Ошибка при создании карты:', error);
+            document.getElementById('map').innerHTML = `
+                <div class="alert alert-danger">
+                    Ошибка загрузки карты: ${error.message}
+                </div>
+            `;
+        }
+    }
 </script>
 {% endblock %}

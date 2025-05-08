@@ -11,14 +11,15 @@ from django.core.files.base import ContentFile
 from .forms import ResearchForm, ResearchFileForm, DefectForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Research, ResearchFile, Defect
 import xml.etree.ElementTree as ET
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import Research, Defect
 from .forms import XMLUploadForm
-from .models import News
 from .forms import NewsForm
+from .forms import RouteForm
+from .models import Research, ResearchFile, Defect, News, Route  # Добавьте Route в импорты
+from django.conf import settings
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Research, Route
 
 def login_view(request):
     if request.method == 'POST':
@@ -355,18 +356,49 @@ from django.http import JsonResponse
 
 @login_required
 def view_route(request, research_id):
+    try:
+        research = get_object_or_404(Research, id=research_id, user=request.user)
+        route = get_object_or_404(Route, research=research)
+
+        coordinates = []
+        if route.coordinates:
+            for coord_pair in route.coordinates.split(';'):
+                try:
+                    lon, lat = coord_pair.split(',')
+                    coordinates.append({
+                        'lat': float(lat.strip()),
+                        'lon': float(lon.strip())
+                    })
+                except (ValueError, AttributeError) as e:
+                    print(f"Ошибка обработки координат: {e}")
+                    continue
+
+        context = {
+            'route': route,
+            'coordinates': coordinates,
+            'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY
+        }
+
+        return render(request, 'view_route.html', context)
+    except Exception as e:
+        print(f"Ошибка в view_route: {str(e)}")
+        raise
+
+@login_required
+def add_route_view(request, research_id):
+    print("DEBUG: Entering add_route_view")  # Добавьте эту строку
     research = get_object_or_404(Research, id=research_id, user=request.user)
-    route = get_object_or_404(Route, research=research)
-
-    # Преобразуем координаты в формат для Yandex Maps
-    coordinates = []
-    if route.coordinates:
-        for coord in route.coordinates.split(';'):
-            lon, lat = coord.split(',')
-            coordinates.append({'lat': float(lat), 'lon': float(lon)})
-
-    return render(request, 'view_route.html', {
-        'route': route,
-        'coordinates': coordinates,
-        'yandex_maps_api_key': '37265303-7eff-4755-abb1-3b69b29ecd97'  # Замените на ваш API ключ
-    })
+    if request.method == 'POST':
+        print("DEBUG: POST request received")  # Добавьте эту строку
+        form = RouteForm(request.POST, request.FILES)
+        if form.is_valid():
+            print("DEBUG: Form is valid")  # Добавьте эту строку
+            route = form.save(commit=False)
+            route.research = research
+            route.save()
+            return redirect('research_detail', research_id=research.id)
+        else:
+            print("DEBUG: Form errors:", form.errors)  # Добавьте эту строку
+    else:
+        form = RouteForm()
+    return render(request, 'add_route.html', {'form': form, 'research': research})

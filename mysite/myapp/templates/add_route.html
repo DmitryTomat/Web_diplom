@@ -3,20 +3,12 @@
 {% block title %}Добавить маршрут{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>Добавить маршрут для исследования: {{ research.title }}</h2>
-    
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group">
-            {{ form.kml_file.label_tag }}
-            {{ form.kml_file }}
-            <small class="form-text text-muted">
-                Загрузите KML файл с маршрутом исследования
-            </small>
-        </div>
-        <button type="submit" class="btn btn-primary">Сохранить</button>
-        <a href="{% url 'research_detail' research.id %}" class="btn btn-secondary">Отмена</a>
-    </form>
-</div>
+<h2>Добавить маршрут для исследования: {{ research.title }}</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Сохранить</button>
+    <a href="{% url 'research_detail' research.id %}">Отмена</a>
+</form>
 {% endblock %}
