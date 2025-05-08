@@ -78,3 +78,11 @@ class NewsForm(forms.ModelForm):
     class Meta:
         model = News
         fields = ['title', 'content', 'image']
+
+class RouteForm(forms.ModelForm):
+    class Meta:
+        model = Route
+        fields = ['kml_file']
+        widgets = {
+            'kml_file': forms.FileInput(attrs={'accept': '.kml'})
+        }

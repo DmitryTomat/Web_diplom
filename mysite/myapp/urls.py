@@ -31,4 +31,5 @@ urlpatterns = [
     path('news/edit/<int:news_id>/', views.edit_news_view, name='edit_news'),
     path('news/delete/<int:news_id>/', views.delete_news_view, name='delete_news'),  # Исправлен news.delete
     path('news/<int:news_id>/', views.news_detail_view, name='news_detail'),
+    path('research/<int:research_id>/add_route/', views.add_route_view, name='add_route'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # Исправлен знак равенства

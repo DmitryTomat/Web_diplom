@@ -68,3 +68,11 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+class Route(models.Model):
+    research = models.ForeignKey(Research, on_delete=models.CASCADE, related_name='routes')
+    kml_file = models.FileField(upload_to='research_routes/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Route for {self.research.title}"
