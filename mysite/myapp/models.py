@@ -69,10 +69,41 @@ class News(models.Model):
     def __str__(self):
         return self.title
 
+
 class Route(models.Model):
     research = models.ForeignKey(Research, on_delete=models.CASCADE, related_name='routes')
     kml_file = models.FileField(upload_to='research_routes/')
     created_at = models.DateTimeField(auto_now_add=True)
+    coordinates = models.TextField(blank=True, null=True)  # Добавляем поле для хранения координат
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # При сохранении парсим KML файл и извлекаем координаты
+        if self.kml_file:
+            self.parse_kml_and_save_coordinates()
+
+    def parse_kml_and_save_coordinates(self):
+        try:
+            import xml.etree.ElementTree as ET
+            from django.core.files.base import ContentFile
+            kml_content = self.kml_file.read().decode('utf-8')
+            root = ET.fromstring(kml_content)
+
+            # Ищем координаты в KML файле
+            coordinates = []
+            for placemark in root.findall('.//{http://www.opengis.net/kml/2.2}Placemark'):
+                linestring = placemark.find('{http://www.opengis.net/kml/2.2}LineString')
+                if linestring is not None:
+                    coords = linestring.find('{http://www.opengis.net/kml/2.2}coordinates')
+                    if coords is not None and coords.text:
+                        coordinates = coords.text.strip().split()
+
+            # Сохраняем координаты в формате "lon,lat;lon,lat;..."
+            if coordinates:
+                self.coordinates = ';'.join([','.join(coord.split(',')[:2]) for coord in coordinates])
+                super().save(update_fields=['coordinates'])
+        except Exception as e:
+            print(f"Error parsing KML: {e}")
 
     def __str__(self):
         return f"Route for {self.research.title}"

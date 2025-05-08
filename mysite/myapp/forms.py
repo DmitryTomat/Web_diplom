@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 
-from .models import Research, ResearchFile
+from .models import Research, ResearchFile, Route
 from .models import Defect
 from .models import News
 
@@ -84,5 +84,11 @@ class RouteForm(forms.ModelForm):
         model = Route
         fields = ['kml_file']
         widgets = {
-            'kml_file': forms.FileInput(attrs={'accept': '.kml'})
+            'kml_file': forms.FileInput(attrs={
+                'accept': '.kml',
+                'class': 'form-control'
+            })
+        }
+        labels = {
+            'kml_file': 'KML файл с маршрутом'
         }
