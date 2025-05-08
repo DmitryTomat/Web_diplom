@@ -348,3 +348,25 @@ def api_login(request):
         return JsonResponse({"status": "test"})
 
     return JsonResponse({"error": "Only POST allowed"}, status=405)
+
+
+from django.http import JsonResponse
+
+
+@login_required
+def view_route(request, research_id):
+    research = get_object_or_404(Research, id=research_id, user=request.user)
+    route = get_object_or_404(Route, research=research)
+
+    # Преобразуем координаты в формат для Yandex Maps
+    coordinates = []
+    if route.coordinates:
+        for coord in route.coordinates.split(';'):
+            lon, lat = coord.split(',')
+            coordinates.append({'lat': float(lat), 'lon': float(lon)})
+
+    return render(request, 'view_route.html', {
+        'route': route,
+        'coordinates': coordinates,
+        'yandex_maps_api_key': 'ваш_api_ключ'  # Замените на ваш API ключ
+    })

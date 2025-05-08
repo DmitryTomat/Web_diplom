@@ -17,6 +17,16 @@
         {% empty %}
             <li>Файлы не загружены</li>
         {% endfor %}
+        {% if research.routes.exists %}
+            <h3>Маршрут исследования:</h3>
+            <a href="{% url 'view_route' research.id %}" class="btn btn-primary" target="_blank">
+                Открыть маршрут
+            </a>
+        {% else %}
+            <a href="{% url 'add_route' research.id %}" class="btn btn-secondary">
+                Добавить маршрут
+            </a>
+        {% endif %}
     </ul>
 
     <h3>Дефекты:</h3>

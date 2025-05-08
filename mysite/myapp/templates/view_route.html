@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Просмотр маршрута{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Маршрут исследования: {{ route.research.title }}</h2>
+    
+    <div id="map" style="width: 100%; height: 500px;"></div>
+    
+    <div class="mt-3">
+        <a href="{% url 'research_detail' route.research.id %}" class="btn btn-primary">
+            Вернуться к исследованию
+        </a>
+    </div>
+</div>
+
+<script src="https://api-maps.yandex.ru/2.1/?apikey={{ 37265303-7eff-4755-abb1-3b69b29ecd97 }}&lang=ru_RU" type="text/javascript"></script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Координаты из Django в формате [lon, lat]
+        const routeCoordinates = [
+            {% for coord in coordinates %}
+                [{{ coord.lon }}, {{ coord.lat }}]{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        // Инициализация карты
+        ymaps.ready(function() {
+            const map = new ymaps.Map('map', {
+                center: routeCoordinates[0],
+                zoom: 15,
+                controls: ['zoomControl', 'typeSelector', 'fullscreenControl']
+            });
+            
+            // Создаем ломаную линию
+            const routeLine = new ymaps.Polyline(routeCoordinates, {}, {
+                strokeColor: '#0000FF',
+                strokeWidth: 4,
+                strokeOpacity: 0.7
+            });
+            
+            // Добавляем линию на карту
+            map.geoObjects.add(routeLine);
+            
+            // Устанавливаем границы карты так, чтобы маршрут был виден целиком
+            map.setBounds(routeLine.geometry.getBounds(), {
+                checkZoomRange: true
+            });
+            
+            // Добавляем точки маршрута
+            routeCoordinates.forEach(function(coord, index) {
+                const placemark = new ymaps.Placemark(coord, {
+                    hintContent: `Точка ${index + 1}`,
+                    balloonContent: `Координаты: ${coord[1]}, ${coord[0]}`
+                });
+                map.geoObjects.add(placemark);
+            });
+        });
+    });
+</script>
+{% endblock %}
