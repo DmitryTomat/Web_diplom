@@ -21,18 +21,27 @@ def api_login(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            username = data.get('username')
+            username_or_email = data.get('username_or_email')  # Изменено с 'username'
             password = data.get('password')
 
-            logger.info(f"Authenticating user: {username}")
+            logger.info(f"Authenticating user: {username_or_email}")
+
+            # Пытаемся найти пользователя по email или username
+            User = get_user_model()
+            if '@' in username_or_email:
+                try:
+                    user = User.objects.get(email=username_or_email)
+                    username = user.username
+                except User.DoesNotExist:
+                    username = username_or_email
+            else:
+                username = username_or_email
+
             user = authenticate(username=username, password=password)
 
             if user is not None:
-                # Создаем простой токен (в реальном приложении используйте JWT)
-                from django.contrib.auth import login
-                from django.contrib.sessions.models import Session
-
                 # Создаем сессию для пользователя
+                from django.contrib.auth import login
                 login(request, user)
 
                 # Генерируем простой токен на основе сессии
@@ -45,7 +54,7 @@ def api_login(request):
                     'username': user.username
                 })
             else:
-                logger.warning(f"Invalid credentials for user: {username}")
+                logger.warning(f"Invalid credentials for user: {username_or_email}")
                 return JsonResponse({
                     'status': 'error',
                     'error': 'Invalid credentials'

@@ -25,8 +25,19 @@ def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
+            username_or_email = form.cleaned_data['username_or_email']
             password = form.cleaned_data['password']
+
+            # Пытаемся найти пользователя по username или email
+            if '@' in username_or_email:
+                try:
+                    user = User.objects.get(email=username_or_email)
+                    username = user.username
+                except User.DoesNotExist:
+                    username = username_or_email
+            else:
+                username = username_or_email
+
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -36,6 +47,7 @@ def login_view(request):
                 form.add_error(None, 'Неправильно введён логин или пароль')
     else:
         form = LoginForm()
+
     return render(request, 'login.html', {'form': form})
 
 @login_required

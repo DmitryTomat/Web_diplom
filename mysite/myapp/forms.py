@@ -7,7 +7,7 @@ from .models import Defect
 from .models import News
 
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=100)
+    username_or_email = forms.CharField(label="Логин или Email", max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
 
 class RegistrationForm(forms.ModelForm):
@@ -18,13 +18,19 @@ class RegistrationForm(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'password']
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Пользователь с таким email уже существует")
+        return email
+
     def clean(self):
         cleaned_data = super(RegistrationForm, self).clean()
         password = cleaned_data.get("password")
         confirm_password = cleaned_data.get("confirm_password")
 
         if password != confirm_password:
-            raise forms.ValidationError("Passwords do not match")
+            raise forms.ValidationError("Пароли не совпадают")
 
 class UserForm(forms.ModelForm):
     class Meta:
