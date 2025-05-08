@@ -1,4 +1,4 @@
-from datetime import timezone
+from django.utils import timezone
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -26,7 +26,7 @@ class ResearchFile(models.Model):
 
 class Defect(models.Model):
     research = models.ForeignKey(Research, on_delete=models.CASCADE, related_name='defects')
-    defect_date = models.DateTimeField()
+    defect_date = models.DateTimeField(default=timezone.now)
     defect_name = models.CharField(max_length=255)
     defect_description = models.TextField()
     defect_coordinates = models.CharField(max_length=255)

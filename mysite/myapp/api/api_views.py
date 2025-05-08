@@ -1,4 +1,5 @@
 from xml.etree import ElementTree as ET
+from django.utils import timezone
 from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
@@ -373,7 +374,12 @@ def api_upload_research(request):
         data = json.loads(request.body)
         title = data.get('title')
         description = data.get('description')
-        defects = data.get('defects', [])
+        kml_content = data.get('kml_content', '')
+        xml_content = data.get('xml_content', '')
+        defects = data.get('defects', [])  # Получаем список дефектов
+
+        logger.info(f"Received data: {data}")
+        logger.info(f"Defects received: {len(defects)}")
 
         # Проверка обязательных полей
         if not title or not description:
@@ -393,18 +399,12 @@ def api_upload_research(request):
         defects_count = 0
         for defect_data in defects:
             try:
-                # Проверяем наличие координат
-                lat = defect_data.get('latitude', '0')
-                lon = defect_data.get('longitude', '0')
-                if not lat or not lon:
-                    continue
-
                 Defect.objects.create(
                     research=research,
                     defect_name=defect_data.get('name', ''),
                     defect_description=defect_data.get('description', ''),
                     defect_type=defect_data.get('type', ''),
-                    defect_coordinates=f"{lat},{lon}",
+                    defect_coordinates=f"{defect_data.get('latitude', '0')},{defect_data.get('longitude', '0')}",
                     defect_date=timezone.now()
                 )
                 defects_count += 1
