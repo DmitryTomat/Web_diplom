@@ -4,7 +4,7 @@ from django.core.validators import FileExtensionValidator
 
 from .models import Research, ResearchFile, Route
 from .models import Defect
-from .models import News
+from .models import News, ForumMessage
 
 class LoginForm(forms.Form):
     username_or_email = forms.CharField(label="Логин или Email", max_length=100)
@@ -97,4 +97,20 @@ class RouteForm(forms.ModelForm):
         }
         labels = {
             'kml_file': 'KML файл с маршрутом'
+        }
+
+class ForumMessageForm(forms.ModelForm):
+    class Meta:
+        model = ForumMessage
+        fields = ['title', 'content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4}),
+        }
+
+class ForumReplyForm(forms.ModelForm):
+    class Meta:
+        model = ForumMessage
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 3}),
         }

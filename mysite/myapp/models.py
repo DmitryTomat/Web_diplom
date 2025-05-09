@@ -107,3 +107,21 @@ class Route(models.Model):
 
     def __str__(self):
         return f"Route for {self.research.title}"
+
+
+class ForumMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    parent_message = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} by {self.user.username}"
+
+    def get_replies(self):
+        return ForumMessage.objects.filter(parent_message=self).order_by('created_at')
+
+    def can_delete(self, user):
+        return user.is_staff or user == self.user

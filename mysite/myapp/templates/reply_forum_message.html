@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ответить на сообщение{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Ответить на сообщение</h2>
+    <div class="card mb-3">
+        <div class="card-header">
+            {{ parent_message.user.username }} | {{ parent_message.created_at|date:"d.m.Y H:i" }}
+        </div>
+        <div class="card-body">
+            <h5>{{ parent_message.title }}</h5>
+            <p>{{ parent_message.content }}</p>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Отправить ответ</button>
+        <a href="{% url 'forum' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

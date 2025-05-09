@@ -14,8 +14,8 @@ from django.contrib.auth.decorators import login_required
 import xml.etree.ElementTree as ET
 from .forms import XMLUploadForm
 from .forms import NewsForm
-from .forms import RouteForm
-from .models import Research, ResearchFile, Defect, News, Route  # Добавьте Route в импорты
+from .forms import RouteForm, ForumMessageForm, ForumReplyForm
+from .models import Research, ResearchFile, Defect, News, Route, ForumMessage  # Добавьте Route в импорты
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -414,3 +414,55 @@ def add_route_view(request, research_id):
     else:
         form = RouteForm()
     return render(request, 'add_route.html', {'form': form, 'research': research})
+
+@login_required
+def forum_view(request):
+    main_messages = ForumMessage.objects.filter(parent_message__isnull=True).order_by('-created_at')
+    return render(request, 'forum.html', {'messages': main_messages})
+
+@login_required
+def create_forum_message(request):
+    if request.method == 'POST':
+        form = ForumMessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.user = request.user
+            message.save()
+            return redirect('forum')
+    else:
+        form = ForumMessageForm()
+    return render(request, 'create_forum_message.html', {'form': form})
+
+@login_required
+def reply_forum_message(request, message_id):
+    parent_message = get_object_or_404(ForumMessage, id=message_id)
+    if request.method == 'POST':
+        form = ForumReplyForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.user = request.user
+            reply.parent_message = parent_message
+            reply.title = f"Re: {parent_message.title}"
+            reply.save()
+            return redirect('forum')
+    else:
+        form = ForumReplyForm()
+    return render(request, 'reply_forum_message.html', {
+        'form': form,
+        'parent_message': parent_message
+    })
+
+@login_required
+def delete_forum_message(request, message_id):
+    message = get_object_or_404(ForumMessage, id=message_id)
+
+    if not message.can_delete(request.user):
+        messages.error(request, "У вас нет прав для удаления этого сообщения")
+        return redirect('forum')
+
+    if request.method == 'POST':
+        message.delete()
+        messages.success(request, "Сообщение успешно удалено")
+        return redirect('forum')
+
+    return render(request, 'confirm_delete_message.html', {'message': message})

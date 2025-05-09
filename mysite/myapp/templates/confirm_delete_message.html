@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Удаление сообщения{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Подтверждение удаления</h2>
+    
+    <div class="card mb-3">
+        <div class="card-header">
+            {{ message.user.username }} | {{ message.created_at|date:"d.m.Y H:i" }}
+        </div>
+        <div class="card-body">
+            <h5>{{ message.title }}</h5>
+            <p>{{ message.content }}</p>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <p>Вы уверены, что хотите удалить это сообщение?</p>
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="{% url 'forum' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}
