@@ -741,3 +741,30 @@ form textarea {
     width: 40px;
     height: 40px;
 }
+
+/* Инструкция по установке */
+.installation-steps {
+    counter-reset: step;
+}
+
+.installation-steps li {
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 10px;
+    list-style-type: none;
+}
+
+.installation-steps li:before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    background-color: #007bff;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 20px;
+    font-size: 12px;
+}

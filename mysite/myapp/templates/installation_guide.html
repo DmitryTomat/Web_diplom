@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Инструкция по установке{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Инструкция по установке PipeAriApp</h2>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <h3>Для Android:</h3>
+            <ol>
+                <li>Скачайте APK-файл по ссылке или через QR-код</li>
+                <li>Перейдите в Настройки → Безопасность и разрешите установку из неизвестных источников</li>
+                <li>Откройте скачанный файл и нажмите "Установить"</li>
+                <li>После установки откройте приложение</li>
+            </ol>
+          
+            
+            <div class="alert alert-info mt-4">
+                <h4>Требования:</h4>
+                <ul>
+                    <li>Android 8.0 или новее</li>
+                    <li>1 ГБ свободной памяти</li>
+                    <li>GPS и камера</li>
+                </ul>
+            </div>
+            
+            <div class="mt-4">
+                <h4>Проблемы с установкой?</h4>
+                <p>Если у вас возникли проблемы, свяжитесь с технической поддержкой:</p>
+                <a href="mailto:support@pipeariapp.com" class="btn btn-primary">
+                    <i class="bi bi-envelope"></i> Написать в поддержку
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

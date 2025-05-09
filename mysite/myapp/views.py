@@ -466,3 +466,6 @@ def delete_forum_message(request, message_id):
         return redirect('forum')
 
     return render(request, 'confirm_delete_message.html', {'message': message})
+
+def installation_guide_view(request):
+    return render(request, 'installation_guide.html')

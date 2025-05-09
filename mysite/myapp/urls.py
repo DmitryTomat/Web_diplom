@@ -37,4 +37,5 @@ urlpatterns = [
     path('forum/create/', views.create_forum_message, name='create_forum_message'),
     path('forum/reply/<int:message_id>/', views.reply_forum_message, name='reply_forum_message'),
     path('forum/delete/<int:message_id>/', views.delete_forum_message, name='delete_forum_message'),
+    path('installation-guide/', views.installation_guide_view, name='installation_guide'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # Исправлен знак равенства

@@ -29,7 +29,7 @@
                             <a href="https://disk.yandex.ru/d/A2a8gJpVJqTiDQ" class="btn btn-primary" target="_blank">
                                 <i class="bi bi-download"></i> Скачать приложение
                             </a>
-                            <a href="#" class="btn btn-secondary">
+                            <a href="{% url 'installation_guide' %}" class="btn btn-secondary">
                                 <i class="bi bi-file-earmark-arrow-down"></i> Инструкция по установке
                             </a>
                         </div>
@@ -37,7 +37,7 @@
                     </div>
                     <div class="col-md-6 text-center">
                         <h4>Или сканируйте QR-код</h4>
-                            <img src="{% static 'qr-code.png' %}" alt="QR-код" class="img-fluid" style="max-width: 200px;">
+                        <img src="{% static 'qr-code.png' %}" alt="QR-код" class="img-fluid" style="max-width: 200px;">
                         <p class="text-muted mt-2">Наведите камеру телефона на QR-код</p>
                     </div>
                 </div>
