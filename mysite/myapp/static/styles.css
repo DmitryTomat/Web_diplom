@@ -10,8 +10,8 @@ body {
 .header {
     display: flex;
     justify-content: space-between; /* Распределение элементов по краям */
-    align-items: center; /* Выравнивание по центру вертикально */
-    padding: 20px;
+    padding: 10px;
+    margin: 0 auto; /* Центрирование */
     background-color: #fff; /* Цвет фона шапки */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Тень */
 }
@@ -29,8 +29,8 @@ body {
 /* Навигация */
 .nav {
     display: flex;
-    gap: 100px; /* Расстояние между элементами */
-    margin-right: 100px; /* Отступ справа */
+    gap: 20px; /* Расстояние между элементами */
+    margin-right: 50px; /* Отступ справа */
 }
 
 .nav a {
@@ -767,4 +767,584 @@ form textarea {
     text-align: center;
     line-height: 20px;
     font-size: 12px;
+}
+
+/* Медиа-запросы для мобильных устройств */
+@media (max-width: 768px) {
+    /* Шапка сайта */
+    .header {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .logo {
+        margin-bottom: 10px;
+        width: 120px;
+    }
+
+    .nav {
+        flex-direction: column;
+        gap: 15px;
+        margin-right: 0;
+        width: 100%;
+    }
+
+    .profile-dropdown {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Основной контент */
+    .content {
+        padding: 10px;
+    }
+
+    /* Формы */
+    form {
+        width: 100%;
+    }
+
+    form input, form textarea, form select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* О нас */
+    .about-container {
+        padding: 15px;
+    }
+
+    /* Профиль */
+    .profile-container {
+        padding: 15px;
+    }
+
+    .profile-header {
+        margin-bottom: 20px;
+    }
+
+    .profile-details {
+        gap: 15px;
+    }
+
+    .detail-card {
+        width: 100%;
+        max-width: none;
+    }
+
+    /* Таблицы */
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+
+    /* Новости */
+    .news-block {
+        padding: 15px;
+    }
+
+    /* Форум */
+    .forum-messages .card {
+        margin-bottom: 15px;
+    }
+
+    /* Социальные иконки */
+    .social-icons {
+        gap: 15px;
+    }
+
+    .social-icons img {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Кнопки */
+    .btn {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+
+    /* Формы входа/регистрации */
+    .login-form, .register-form {
+        width: 90%;
+    }
+
+    /* Навигация в шапке */
+    .nav a {
+        font-size: 16px;
+        display: block;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Выпадающее меню профиля */
+    .profile-dropdown .dropdown-content {
+        position: static;
+        display: none;
+        width: 100%;
+        box-shadow: none;
+    }
+
+    .profile-dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    /* Исследования */
+    .research-list-container {
+        padding: 15px;
+    }
+
+    /* Пользователи */
+    .user-list-container {
+        padding: 15px;
+    }
+
+    /* Скрытие некоторых элементов в таблицах на маленьких экранах */
+    .hidden-mobile {
+        display: none;
+    }
+}
+
+/* Дополнительные адаптации для очень маленьких экранов */
+@media (max-width: 480px) {
+    /* Уменьшаем отступы */
+    .content {
+        padding: 8px;
+    }
+
+    /* Уменьшаем размер текста */
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    p {
+        font-size: 14px;
+    }
+
+    /* Уменьшаем размер иконок */
+    .social-icons img {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Адаптация таблиц */
+    .user-table, .research-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    /* Кнопки действий в таблицах */
+    .actions {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    /* Формы */
+    form button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* Профиль */
+    .profile-img, .no-photo {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* Добавьте это в конец файла styles.css */
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    /* Общие стили для форм */
+    .container {
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Формы создания/редактирования */
+    form {
+        width: 100%;
+    }
+
+    form p {
+        margin-bottom: 1rem;
+    }
+
+    form input,
+    form textarea,
+    form select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    form textarea {
+        min-height: 150px;
+    }
+
+    form button {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    /* Кнопки действий */
+    .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    /* Форум */
+    .forum-messages .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .forum-messages .card-header h5 {
+        margin-bottom: 5px;
+    }
+
+    .forum-messages .card-header div {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .forum-messages .btn-sm {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+
+    /* Инструкция по установке */
+    .installation-steps li {
+        margin-bottom: 15px;
+    }
+
+    .alert {
+        padding: 10px;
+    }
+
+    /* Карточки */
+    .card {
+        margin-bottom: 15px;
+    }
+
+    /* Навигация */
+    .nav {
+        flex-direction: column;
+        gap: 10px;
+        margin-right: 0;
+    }
+
+    /* Подтверждение удаления */
+    .confirm-delete {
+        text-align: center;
+    }
+
+    .confirm-delete p {
+        margin-bottom: 20px;
+    }
+
+    /* Ссылки "Назад" */
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+    }
+}
+
+/* Адаптация для очень маленьких экранов */
+@media (max-width: 480px) {
+    h2 {
+        font-size: 1.3rem;
+    }
+
+    form button {
+        padding: 10px;
+    }
+
+    /* Форум */
+    .forum-messages .card-header div {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .forum-messages .btn-sm {
+        margin-top: 5px;
+        width: 100%;
+    }
+}
+
+/* Добавьте это в конец файла styles.css */
+
+/* Мобильная адаптация для новых шаблонов */
+@media (max-width: 768px) {
+    /* Детали новости */
+    .news-detail-container {
+        padding: 15px;
+    }
+
+    .news-title {
+        font-size: 1.5rem;
+    }
+
+    .news-image {
+        max-width: 100%;
+        height: auto;
+        margin: 10px 0;
+    }
+
+    .news-content {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    /* Профиль пользователя */
+    .profile-container {
+        padding: 15px;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-details {
+        gap: 10px;
+    }
+
+    .detail-card {
+        padding: 10px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+    }
+
+    .profile-actions .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    /* Форма регистрации */
+    .register-form-container {
+        padding: 15px;
+    }
+
+    .register-form {
+        width: 100%;
+        padding: 15px;
+    }
+
+    /* Детали исследования */
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    /* Список исследований */
+    .research-list-container table {
+        font-size: 14px;
+    }
+
+    .research-list-container img {
+        max-width: 60px;
+    }
+
+    /* Настройки пользователя */
+    .settings-container {
+        padding: 15px;
+    }
+
+    .form-group input {
+        width: 100%;
+    }
+
+    /* Форум - ответ на сообщение */
+    .reply-form-container {
+        padding: 15px;
+    }
+
+    .reply-form {
+        width: 100%;
+    }
+}
+
+/* Адаптация для очень маленьких экранов */
+@media (max-width: 480px) {
+    /* Детали новости */
+    .news-title {
+        font-size: 1.3rem;
+    }
+
+    /* Профиль */
+    .profile-img, .no-photo {
+        width: 80px;
+        height: 80px;
+    }
+
+    /* Форма регистрации */
+    .register-form {
+        padding: 10px;
+    }
+
+    /* Список исследований */
+    .research-list-container table th,
+    .research-list-container table td {
+        padding: 8px 5px;
+    }
+
+    /* Настройки пользователя */
+    .settings-container h2 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Добавьте это в конец файла styles.css */
+
+/* Мобильная адаптация для новых шаблонов */
+@media (max-width: 768px) {
+    /* Список пользователей */
+    .user-list-container {
+        padding: 15px;
+        overflow-x: auto;
+    }
+
+    .user-table {
+        font-size: 14px;
+    }
+
+    .user-table th,
+    .user-table td {
+        padding: 8px;
+    }
+
+    .actions {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .actions .btn {
+        width: 100%;
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    /* Загрузка XML */
+    .upload-xml-container {
+        padding: 15px;
+    }
+
+    /* Страница новостей */
+    .news-list {
+        margin-top: 15px;
+    }
+
+    .news-block {
+        padding: 15px;
+    }
+
+    .news-image {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .sort-by {
+        margin: 15px 0;
+    }
+
+    /* Форма входа */
+    .login-form-container {
+        padding: 15px;
+    }
+
+    .login-form {
+        width: 100%;
+    }
+
+    /* Просмотр маршрута */
+    #map {
+        height: 300px;
+    }
+
+    /* Загрузка файлов */
+    .upload-file-container {
+        padding: 15px;
+    }
+
+    /* Выбор входа */
+    .login-choice {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .login-choice a {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Список исследований пользователя */
+    .user-research-container {
+        padding: 15px;
+    }
+
+    /* Программное обеспечение */
+    .software-container {
+        padding: 15px;
+    }
+
+    .software-container .row {
+        flex-direction: column;
+    }
+
+    .software-container .col-md-6 {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .list-group-item {
+        padding: 10px 15px;
+    }
+}
+
+/* Адаптация для очень маленьких экранов */
+@media (max-width: 480px) {
+    /* Список пользователей */
+    .user-table {
+        font-size: 12px;
+    }
+
+    /* Форма входа */
+    .login-form input {
+        padding: 8px;
+    }
+
+    /* Просмотр маршрута */
+    #map {
+        height: 250px;
+    }
+
+    /* Программное обеспечение */
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }

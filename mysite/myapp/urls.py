@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
@@ -34,8 +35,8 @@ urlpatterns = [
     path('research/<int:research_id>/add_route/', views.add_route_view, name='add_route'),
     path('research/<int:research_id>/view_route/', views.view_route, name='view_route'),
     path('forum/', views.forum_view, name='forum'),
-    path('forum/create/', views.create_forum_message, name='create_forum_message'),
-    path('forum/reply/<int:message_id>/', views.reply_forum_message, name='reply_forum_message'),
-    path('forum/delete/<int:message_id>/', views.delete_forum_message, name='delete_forum_message'),
+    path('forum/create/', login_required(views.create_forum_message), name='create_forum_message'),
+    path('forum/reply/<int:message_id>/', login_required(views.reply_forum_message), name='reply_forum_message'),
+    path('forum/delete/<int:message_id>/', login_required(views.delete_forum_message), name='delete_forum_message'),
     path('installation-guide/', views.installation_guide_view, name='installation_guide'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # Исправлен знак равенства

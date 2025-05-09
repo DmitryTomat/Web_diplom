@@ -415,10 +415,14 @@ def add_route_view(request, research_id):
         form = RouteForm()
     return render(request, 'add_route.html', {'form': form, 'research': research})
 
-@login_required
+
 def forum_view(request):
     main_messages = ForumMessage.objects.filter(parent_message__isnull=True).order_by('-created_at')
-    return render(request, 'forum.html', {'messages': main_messages})
+    return render(request, 'forum.html', {
+        'messages': main_messages,
+        'request': request,
+        'user': request.user  # Добавляем user в контекст
+    })
 
 @login_required
 def create_forum_message(request):
