@@ -688,6 +688,15 @@ form {
     transform: scale(1.1);
 }
 
+.error-message {
+    color: #dc3545; /* Красный цвет для ошибки */
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+}
+
 .social-icons img {
     width: 40px;
     height: 40px;

@@ -1,8 +1,64 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Программное обеспечение{% endblock %}
 
 {% block content %}
-    <h2>Программное обеспечение</h2>
-    <p>Здесь вы можете узнать о нашем программном обеспечении.</p>
+    <div class="container mt-4">
+        <h2>Программное обеспечение</h2>
+        <p>Здесь вы можете узнать о нашем программном обеспечении и скачать необходимые приложения.</p>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">PipeAriApp</h3>
+                <p class="card-text">
+                    PipeAriApp - это мобильное приложение для проведения обследований трубопроводов и фиксации дефектов.
+                    Приложение позволяет:
+                </p>
+                <ul>
+                    <li>Записывать координаты дефектов</li>
+                    <li>Добавлять фотографии и описания</li>
+                    <li>Синхронизировать данные с веб-платформой</li>
+                    <li>Экспортировать данные в различных форматах</li>
+                </ul>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h4>Скачать PipeAriApp</h4>
+                        <div class="d-flex flex-wrap gap-3 mt-3">
+                            <a href="https://disk.yandex.ru/d/A2a8gJpVJqTiDQ" class="btn btn-primary" target="_blank">
+                                <i class="bi bi-download"></i> Скачать приложение
+                            </a>
+                            <a href="#" class="btn btn-secondary">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Инструкция по установке
+                            </a>
+                        </div>
+                        <p class="mt-2 text-muted">Версия 1.0 | Размер: 192 MB</p>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <h4>Или сканируйте QR-код</h4>
+                            <img src="{% static 'qr-code.png' %}" alt="QR-код" class="img-fluid" style="max-width: 200px;">
+                        <p class="text-muted mt-2">Наведите камеру телефона на QR-код</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">Дополнительные материалы</h3>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="#">Руководство пользователя</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#">Примеры XML-файлов для импорта</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#">Шаблоны отчетов</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 {% endblock %}
