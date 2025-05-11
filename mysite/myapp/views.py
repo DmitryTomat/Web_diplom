@@ -416,6 +416,18 @@ def add_route_view(request, research_id):
         form = RouteForm()
     return render(request, 'add_route.html', {'form': form, 'research': research})
 
+@login_required
+def delete_route(request, research_id):
+    research = get_object_or_404(Research, id=research_id, user=request.user)
+    route = get_object_or_404(Route, research=research)
+
+    if request.method == 'POST':
+        route.delete()
+        messages.success(request, 'Маршрут успешно удален')
+        return redirect('research_detail', research_id=research.id)
+
+    return render(request, 'confirm_delete_route.html', {'research': research})
+
 
 def forum_view(request):
     main_messages = ForumMessage.objects.filter(parent_message__isnull=True).order_by('-created_at')

@@ -34,6 +34,7 @@ urlpatterns = [
     path('news/<int:news_id>/', views.news_detail_view, name='news_detail'),
     path('research/<int:research_id>/add_route/', views.add_route_view, name='add_route'),
     path('research/<int:research_id>/view_route/', views.view_route, name='view_route'),
+    path('research/<int:research_id>/delete_route/', views.delete_route, name='delete_route'),
     path('forum/', views.forum_view, name='forum'),
     path('forum/create/', login_required(views.create_forum_message), name='create_forum_message'),
     path('forum/reply/<int:message_id>/', login_required(views.reply_forum_message), name='reply_forum_message'),

@@ -1,67 +1,127 @@
 {% extends 'base.html' %}
 
-{% block title %}Детали исследования{% endblock %}
+{% block title %}Детали исследования - {{ research.title }}{% endblock %}
 
 {% block content %}
-    <h2>{{ research.title }}</h2>
-    <p>{{ research.description }}</p>
-    <p>Дата создания: {{ research.created_at|date:"d.m.Y H:i" }}</p>
+<div class="research-detail-container">
+    <div class="research-header">
+        <h2>{{ research.title }}</h2>
+        <div class="research-meta">
+            <span class="research-date">Создано: {{ research.created_at|date:"d.m.Y H:i" }}</span>
+            <div class="research-actions">
+                <a href="{% url 'edit_research' research.id %}" class="btn btn-edit">Редактировать</a>
+                <a href="{% url 'delete_research' research.id %}" class="btn btn-delete">Удалить</a>
+                <a href="{% url 'research_list' %}" class="btn btn-back">Назад к списку</a>
+            </div>
+        </div>
+    </div>
 
-    <h3>Загруженные файлы:</h3>
-    <ul>
-        {% for file in files %}
-            <li>
-                <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
-                <p>{{ file.description }}</p>
-            </li>
-        {% empty %}
-            <li>Файлы не загружены</li>
-        {% endfor %}
+    <div class="research-description">
+        <h3>Описание:</h3>
+        <p>{{ research.description|default:"Описание отсутствует" }}</p>
+    </div>
+
+    <div class="research-section">
+        <h3>Маршрут исследования:</h3>
         {% if research.routes.exists %}
-            <h3>Маршрут исследования:</h3>
-            <a href="{% url 'view_route' research.id %}" class="btn btn-primary" target="_blank">
-                Открыть маршрут
-            </a>
+            <div class="route-info">
+                <p class="route-distance">Длина маршрута: {{ research.routes.first.distance|default:"0" }} км</p>
+                <div class="route-actions">
+                    <a href="{% url 'view_route' research.id %}" class="btn btn-view" target="_blank">
+                        Просмотреть на карте
+                    </a>
+                    <a href="{% url 'add_route' research.id %}" class="btn btn-reupload">
+                        Загрузить заново
+                    </a>
+                    <a href="{% url 'delete_route' research.id %}" class="btn btn-delete">
+                        Удалить маршрут
+                    </a>
+                </div>
+            </div>
         {% else %}
-            <a href="{% url 'add_route' research.id %}" class="btn btn-secondary">
+            <a href="{% url 'add_route' research.id %}" class="btn btn-add">
                 Добавить маршрут
             </a>
         {% endif %}
-    </ul>
+    </div>
 
-    <h3>Дефекты:</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Название дефекта</th>
-                <th>Описание дефекта</th>
-                <th>Дата и время дефекта</th>
-                <th>Координаты дефекта</th>
-                <th>Тип дефекта</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for defect in defects %}
-                <tr>
-                    <td>{{ defect.defect_name }}</td>
-                    <td>{{ defect.defect_description }}</td>
-                    <td>{{ defect.defect_date|date:"d.m.Y H:i" }}</td>
-                    <td>{{ defect.defect_coordinates }}</td>
-                    <td>{{ defect.defect_type }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5">Дефекты не добавлены</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="research-section">
+        <h3>Загруженные файлы:</h3>
+        {% if files %}
+            <ul class="file-list">
+                {% for file in files %}
+                    <li class="file-item">
+                        <a href="{{ file.file.url }}" target="_blank" class="file-link">{{ file.file.name }}</a>
+                        {% if file.description %}
+                            <p class="file-description">{{ file.description }}</p>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-files">Файлы не загружены</p>
+        {% endif %}
+        <a href="{% url 'upload_file' research.id %}" class="btn btn-add-file">
+            Добавить файл
+        </a>
+    </div>
 
-    <a href="{% url 'add_defect' research.id %}">Добавить дефект</a>
-    <br>
-    <a href="{% url 'edit_research' research.id %}">Редактировать исследование</a>
-    <br>
-    <a href="{% url 'delete_research' research.id %}">Удалить исследование</a>
-    <br>
-    <a href="{% url 'research_list' %}">Назад к списку исследований</a>
+    <div class="research-section">
+        <h3>Дефекты:</h3>
+        {% if defects %}
+            <div class="table-responsive">
+                <table class="defects-table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Описание</th>
+                            <th>Дата и время</th>
+                            <th>Координаты</th>
+                            <th>Тип</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for defect in defects %}
+                            <tr>
+                                <td>{{ defect.defect_name }}</td>
+                                <td>{{ defect.defect_description|truncatechars:30 }}</td>
+                                <td>{{ defect.defect_date|date:"d.m.Y H:i" }}</td>
+                                <td>{{ defect.defect_coordinates }}</td>
+                                <td>{{ defect.defect_type }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-defects">Дефекты не добавлены</p>
+        {% endif %}
+        <a href="{% url 'add_defect' research.id %}" class="btn btn-add-defect">
+            Добавить дефект
+        </a>
+    </div>
+</div>
+
+<script>
+    // Подтверждение удаления маршрута
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.href.includes('delete_route')) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Удалить маршрут?',
+                    text: 'Вы уверены, что хотите удалить маршрут этого исследования?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Да, удалить',
+                    cancelButtonText: 'Отмена'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = this.href;
+                    }
+                });
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -3,65 +3,103 @@
 {% block title %}Список исследований{% endblock %}
 
 {% block content %}
+<div class="research-list-container">
     <h2>Список исследований</h2>
-    <a href="#" id="create-research-btn">Создать новое исследование</a>
-    <table>
-        <thead>
-            <tr>
-                <th>
-                    <a href="{% url 'research_list_sorted' 'title' 'asc' %}">↑</a>
-                    <a href="{% url 'research_list_sorted' 'title' 'desc' %}">↓</a>
-                </th>
-                <th>Описание</th>
-                <th>
-                    <a href="{% url 'research_list_sorted' 'date' 'asc' %}">↑</a>
-                    <a href="{% url 'research_list_sorted' 'date' 'desc' %}">↓</a>
-                </th>
-                <th>KML файл</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for research in researches %}
+    <a href="#" id="create-research-btn" class="btn btn-research">Создать новое исследование</a>
+    
+    <div class="table-responsive">
+        <table class="research-table">
+            <thead>
                 <tr>
-                    <td><a href="{% url 'research_detail' research.id %}">{{ research.title }}</a></td>
-                    <td>{{ research.description }}</td>
-                    <td>{{ research.created_at|date:"d.m.Y H:i" }}</td>
-                    </td>
-                    <td>
-                        {% if research.kml_file %}
-                            <a href="{{ research.kml_file.url }}" download>Скачать KML</a>
-                        {% else %}
-                            Нет KML файла
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'edit_research' research.id %}">Редактировать</a>
-                        <br>
-                        <a href="{% url 'delete_research' research.id %}">Удалить</a>
-                    </td>
+                    <th>
+                        Название
+                        <div class="sort-buttons">
+                            <a href="{% url 'research_list_sorted' 'title' 'asc' %}" class="sort-btn">↑</a>
+                            <a href="{% url 'research_list_sorted' 'title' 'desc' %}" class="sort-btn">↓</a>
+                        </div>
+                    </th>
+                    <th>Описание</th>
+                    <th>
+                        Дата
+                        <div class="sort-buttons">
+                            <a href="{% url 'research_list_sorted' 'date' 'asc' %}" class="sort-btn">↑</a>
+                            <a href="{% url 'research_list_sorted' 'date' 'desc' %}" class="sort-btn">↓</a>
+                        </div>
+                    </th>
+                    <th>Маршрут</th>
+                    <th>Действия</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for research in researches %}
+                    <tr>
+                        <td><a href="{% url 'research_detail' research.id %}" class="research-title">{{ research.title }}</a></td>
+                        <td>{{ research.description|truncatechars:50 }}</td>
+                        <td>{{ research.created_at|date:"d.m.Y H:i" }}</td>
+                        <td class="route-cell">
+                            {% if research.routes.exists %}
+                                <div class="route-info">
+                                    <a href="{% url 'view_route' research.id %}" class="route-link">
+                                        Маршрут ({{ research.routes.first.distance|default:"0" }} км)
+                                    </a>
+                                    <div class="route-actions">
+                                        <a href="{% url 'add_route' research.id %}" class="btn btn-sm btn-reupload">Обновить</a>
+                                        <a href="{% url 'delete_route' research.id %}" class="btn btn-sm btn-delete">Удалить</a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <a href="{% url 'add_route' research.id %}" class="btn btn-sm btn-add">Добавить</a>
+                            {% endif %}
+                        </td>
+                        <td class="actions">
+                            <a href="{% url 'edit_research' research.id %}" class="btn btn-sm btn-edit">Ред.</a>
+                            <a href="{% url 'delete_research' research.id %}" class="btn btn-sm btn-delete">Удл.</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-    <script>
-        document.getElementById('create-research-btn').addEventListener('click', function(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: 'Создать новое исследование',
-                text: 'Выберите способ создания:',
-                showCancelButton: true,
-                confirmButtonText: 'Создать вручную',
-                cancelButtonText: 'Загрузить XML-файл',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "{% url 'create_research' %}";
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    window.location.href = "{% url 'upload_xml' %}";
-                }
-            });
+<script>
+    document.getElementById('create-research-btn').addEventListener('click', function(event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Создать новое исследование',
+            text: 'Выберите способ создания:',
+            showCancelButton: true,
+            confirmButtonText: 'Создать вручную',
+            cancelButtonText: 'Загрузить XML-файл',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'create_research' %}";
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = "{% url 'upload_xml' %}";
+            }
         });
-    </script>
+    });
+
+    // Подтверждение удаления маршрута
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.href.includes('delete_route')) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Удалить маршрут?',
+                    text: 'Вы уверены, что хотите удалить маршрут этого исследования?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Да, удалить',
+                    cancelButtonText: 'Отмена'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = this.href;
+                    }
+                });
+            }
+        });
+    });
+</script>
 {% endblock %}
