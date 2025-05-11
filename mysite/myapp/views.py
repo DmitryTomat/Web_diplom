@@ -363,9 +363,6 @@ def api_login(request):
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
 
-from django.http import JsonResponse
-
-
 @login_required
 def view_route(request, research_id):
     try:
@@ -385,9 +382,13 @@ def view_route(request, research_id):
                     print(f"Ошибка обработки координат: {e}")
                     continue
 
+        # Рассчитываем расстояние
+        distance = route.calculate_distance()
+
         context = {
             'route': route,
             'coordinates': coordinates,
+            'distance': distance,  # Добавляем расстояние в контекст
             'yandex_maps_api_key': settings.YANDEX_MAPS_API_KEY
         }
 

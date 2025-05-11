@@ -6,63 +6,72 @@
 <div class="container mt-4">
     <h2>Маршрут исследования: {{ route.research.title }}</h2>
     
+    <div class="alert alert-info">
+        <strong>Общее расстояние маршрута:</strong> {{ distance }} км
+    </div>
+    
     <div id="map" style="width: 100%; height: 500px;"></div>
     
-    <a href="{% url 'research_detail' research_id=route.research.id %}" 
-       class="btn btn-primary mt-3">
+    <a href="{% url 'research_detail' research_id=route.research.id %}" class="btn btn-primary mt-3">
         ← Вернуться к исследованию
     </a>
 </div>
 
-<script src="https://api-maps.yandex.ru/2.1/?apikey={{ yandex_maps_api_key|safe }}&lang=ru_RU"></script>
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    ymaps.ready(initMap);
-    
-    function initMap() {
+    document.addEventListener('DOMContentLoaded', function() {
         try {
-            // Convert coordinates to Yandex Maps format [lon, lat]
-            const points = [
+            // Преобразуем координаты в формат Leaflet [lat, lng]
+            const pathCoordinates = [
                 {% for coord in coordinates %}
-                    [{{ coord.lon }}, {{ coord.lat }}]{% if not forloop.last %},{% endif %}
+                    [{{ coord.lat }}, {{ coord.lon }}]{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ];
             
-            // Create map centered on first point
-            const map = new ymaps.Map('map', {
-                center: points.length > 0 ? points[0] : [0, 0],
-                zoom: 14
-            });
+            // Создаем карту
+            const map = L.map('map').setView(
+                pathCoordinates[0] || [0, 0], 
+                14
+            );
             
-            // Create route line
-            const routeLine = new ymaps.Polyline(points, {
-                strokeColor: "#1e88e5",
-                strokeWidth: 4,
-                strokeOpacity: 0.9
-            });
+            // Добавляем слой OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
             
-            // Add line to map
-            map.geoObjects.add(routeLine);
+            // Создаем линию маршрута
+            const routeLine = L.polyline(pathCoordinates, {
+                color: '#1E90FF',
+                weight: 4,
+                opacity: 0.9,
+                smoothFactor: 1
+            }).addTo(map);
             
-            // Add markers for start and end points
-            if (points.length > 0) {
-                const startPlacemark = new ymaps.Placemark(points[0], {
-                    hintContent: 'Начало маршрута',
-                    balloonContent: 'Начальная точка'
-                });
+            // Добавляем маркеры
+            if (pathCoordinates.length > 0) {
+                L.circleMarker(pathCoordinates[0], {
+                    radius: 5,
+                    fillColor: "green",
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).bindPopup("Начало маршрута").addTo(map);
                 
-                const endPlacemark = new ymaps.Placemark(points[points.length-1], {
-                    hintContent: 'Конец маршрута',
-                    balloonContent: 'Конечная точка'
-                });
-                
-                map.geoObjects.add(startPlacemark);
-                map.geoObjects.add(endPlacemark);
+                L.circleMarker(pathCoordinates[pathCoordinates.length-1], {
+                    radius: 5,
+                    fillColor: "red",
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).bindPopup("Конец маршрута").addTo(map);
             }
             
-            // Adjust map view to show entire route
-            if (points.length > 1) {
-                map.setBounds(routeLine.geometry.getBounds());
+            // Автомасштабирование
+            if (pathCoordinates.length > 1) {
+                map.fitBounds(routeLine.getBounds());
             }
             
         } catch (error) {
@@ -73,6 +82,6 @@
                 </div>
             `;
         }
-    }
+    });
 </script>
 {% endblock %}

@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
+from math import radians, sin, cos, sqrt, atan2
 
 class Research(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='researches')
@@ -74,7 +75,8 @@ class Route(models.Model):
     research = models.ForeignKey(Research, on_delete=models.CASCADE, related_name='routes')
     kml_file = models.FileField(upload_to='research_routes/')
     created_at = models.DateTimeField(auto_now_add=True)
-    coordinates = models.TextField(blank=True, null=True)  # Добавляем поле для хранения координат
+    coordinates = models.TextField(blank=True, null=True)
+    distance = models.FloatField(default=0, verbose_name="Расстояние (м)", null=True, blank=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -102,11 +104,60 @@ class Route(models.Model):
             if coordinates:
                 self.coordinates = ';'.join([','.join(coord.split(',')[:2]) for coord in coordinates])
                 super().save(update_fields=['coordinates'])
+
+                # Рассчитываем и сохраняем расстояние
+                self.distance = self.calculate_distance()
+                super().save(update_fields=['distance'])
         except Exception as e:
             print(f"Error parsing KML: {e}")
 
     def __str__(self):
         return f"Route for {self.research.title}"
+
+    def calculate_distance(self):
+        """
+        Рассчитывает общее расстояние маршрута в километрах (используя формулу гаверсинусов)
+        """
+        if not self.coordinates:
+            return 0.0
+
+        total_distance = 0.0
+        coords = self.coordinates.split(';')
+
+        for i in range(len(coords)-1):
+            try:
+                lon1, lat1 = map(float, coords[i].split(','))
+                lon2, lat2 = map(float, coords[i+1].split(','))
+
+                # Формула гаверсинусов для расчета расстояния между двумя точками на сфере
+                R = 6371.0  # Радиус Земли в км
+
+                lat1_rad = radians(lat1)
+                lon1_rad = radians(lon1)
+                lat2_rad = radians(lat2)
+                lon2_rad = radians(lon2)
+
+                dlon = lon2_rad - lon1_rad
+                dlat = lat2_rad - lat1_rad
+
+                a = sin(dlat / 2)**2 + cos(lat1_rad) * cos(lat2_rad) * sin(dlon / 2)**2
+                c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+                distance = R * c
+                total_distance += distance
+
+            except (ValueError, IndexError):
+                continue
+
+        return round(total_distance, 2)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # При сохранении рассчитываем и сохраняем расстояние
+        if self.kml_file:
+            self.parse_kml_and_save_coordinates()
+            self.distance = self.calculate_distance()
+            super().save(update_fields=['distance'])
 
 
 class ForumMessage(models.Model):

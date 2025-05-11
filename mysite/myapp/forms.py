@@ -99,6 +99,15 @@ class RouteForm(forms.ModelForm):
             'kml_file': 'KML файл с маршрутом'
         }
 
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            # Пересчитываем расстояние после сохранения
+            instance.distance = instance.calculate_distance()
+            instance.save()
+        return instance
+
 class ForumMessageForm(forms.ModelForm):
     class Meta:
         model = ForumMessage

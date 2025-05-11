@@ -17,7 +17,6 @@
                     <a href="{% url 'research_list_sorted' 'date' 'asc' %}">↑</a>
                     <a href="{% url 'research_list_sorted' 'date' 'desc' %}">↓</a>
                 </th>
-                <th>Изображение</th>
                 <th>KML файл</th>
                 <th>Действия</th>
             </tr>
@@ -28,12 +27,6 @@
                     <td><a href="{% url 'research_detail' research.id %}">{{ research.title }}</a></td>
                     <td>{{ research.description }}</td>
                     <td>{{ research.created_at|date:"d.m.Y H:i" }}</td>
-                    <td>
-                        {% if research.image %}
-                            <img src="{{ research.image.url }}" alt="{{ research.title }}" style="max-width: 100px;">
-                        {% else %}
-                            Нет изображения
-                        {% endif %}
                     </td>
                     <td>
                         {% if research.kml_file %}
