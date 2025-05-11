@@ -3,75 +3,116 @@
 {% block title %}Маршрут исследования - {{ route.research.title }}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+    #map { height: 500px; margin-bottom: 20px; border-radius: 8px; }
+    .defect-marker { background-color: red; width: 10px; height: 10px; border-radius: 50%; }
+</style>
+
 <div class="container mt-4">
     <h2>Маршрут исследования: {{ route.research.title }}</h2>
     
+    {% if route.distance %}
     <div class="alert alert-info">
-        <strong>Общее расстояние маршрута:</strong> {{ distance }} км
+        <strong>Общее расстояние маршрута:</strong> {{ route.distance }} км
     </div>
+    {% endif %}
     
-    <div id="map" style="width: 100%; height: 500px;"></div>
+    <div id="map"></div>
     
     <a href="{% url 'research_detail' research_id=route.research.id %}" class="btn btn-primary mt-3">
         ← Вернуться к исследованию
     </a>
 </div>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         try {
-            // Преобразуем координаты в формат Leaflet [lat, lng]
-            const pathCoordinates = [
-                {% for coord in coordinates %}
-                    [{{ coord.lat }}, {{ coord.lon }}]{% if not forloop.last %},{% endif %}
-                {% endfor %}
-            ];
-            
             // Создаем карту
-            const map = L.map('map').setView(
-                pathCoordinates[0] || [0, 0], 
-                14
-            );
+            const map = L.map('map');
             
             // Добавляем слой OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-            
-            // Создаем линию маршрута
-            const routeLine = L.polyline(pathCoordinates, {
-                color: '#1E90FF',
-                weight: 4,
-                opacity: 0.9,
-                smoothFactor: 1
-            }).addTo(map);
-            
-            // Добавляем маркеры
-            if (pathCoordinates.length > 0) {
-                L.circleMarker(pathCoordinates[0], {
-                    radius: 5,
-                    fillColor: "green",
-                    color: "#000",
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).bindPopup("Начало маршрута").addTo(map);
+
+            // Добавляем маршрут, если есть координаты
+            {% if route.coordinates %}
+                const routeCoords = [
+                    {% for coord in coordinates %}
+                        [{{ coord.lat }}, {{ coord.lon }}]{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
                 
-                L.circleMarker(pathCoordinates[pathCoordinates.length-1], {
-                    radius: 5,
-                    fillColor: "red",
-                    color: "#000",
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).bindPopup("Конец маршрута").addTo(map);
-            }
-            
+                const routeLine = L.polyline(routeCoords, {
+                    color: '#1E90FF',
+                    weight: 4,
+                    opacity: 0.9
+                }).addTo(map);
+                
+                // Добавляем маркеры для начальной и конечной точек
+                if (routeCoords.length > 0) {
+                    L.marker(routeCoords[0]).addTo(map)
+                        .bindPopup("Начало маршрута");
+                    
+                    L.marker(routeCoords[routeCoords.length-1]).addTo(map)
+                        .bindPopup("Конец маршрута");
+                }
+            {% endif %}
+
+            // Добавляем дефекты
+            {% for defect in route.research.defects.all %}
+                {% if defect.defect_coordinates %}
+                    try {
+                        const coords = "{{ defect.defect_coordinates }}".split(',');
+                        const lat = parseFloat(coords[0].trim());
+                        const lng = parseFloat(coords[1].trim());
+                        
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const marker = L.marker([lat, lng], {
+                                icon: L.divIcon({
+                                    className: 'defect-marker',
+                                    iconSize: [10, 10]
+                                })
+                            }).addTo(map);
+                            
+                            marker.bindPopup(`
+                                <b>Дефект:</b> {{ defect.defect_name }}<br>
+                                <b>Тип:</b> {{ defect.defect_type }}<br>
+                                <b>Описание:</b> {{ defect.defect_description }}
+                            `);
+                        }
+                    } catch (e) {
+                        console.error("Ошибка обработки координат дефекта:", e);
+                    }
+                {% endif %}
+            {% endfor %}
+
             // Автомасштабирование
-            if (pathCoordinates.length > 1) {
-                map.fitBounds(routeLine.getBounds());
+            const bounds = new L.LatLngBounds();
+            
+            {% if route.coordinates %}
+                routeCoords.forEach(coord => bounds.extend(coord));
+            {% endif %}
+            
+            {% for defect in route.research.defects.all %}
+                {% if defect.defect_coordinates %}
+                    try {
+                        const coords = "{{ defect.defect_coordinates }}".split(',');
+                        const lat = parseFloat(coords[0].trim());
+                        const lng = parseFloat(coords[1].trim());
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            bounds.extend([lat, lng]);
+                        }
+                    } catch (e) {}
+                {% endif %}
+            {% endfor %}
+            
+            if (bounds.isValid()) {
+                map.fitBounds(bounds.pad(0.2));
+            } else {
+                map.setView([55.751244, 37.618423], 10); // Центр по умолчанию
             }
             
         } catch (error) {

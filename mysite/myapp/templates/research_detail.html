@@ -3,6 +3,14 @@
 {% block title %}Детали исследования - {{ research.title }}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+    #map { height: 400px; margin-bottom: 20px; border-radius: 8px; }
+    .map-container { position: relative; }
+    .defect-marker { background-color: red; width: 10px; height: 10px; border-radius: 50%; }
+</style>
+
 <div class="research-detail-container">
     <div class="research-header">
         <h2>{{ research.title }}</h2>
@@ -15,6 +23,60 @@
             </div>
         </div>
     </div>
+
+    <div class="map-container">
+        <h3>Карта дефектов</h3>
+        <div id="map"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Создаем карту с центром по умолчанию
+            const map = L.map('map').setView([55.751244, 37.618423], 10); // Центр - Москва
+            
+            // Добавляем слой OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Добавляем маркеры дефектов
+            {% for defect in defects %}
+                {% if defect.defect_coordinates %}
+                    try {
+                        const coords = "{{ defect.defect_coordinates }}".split(',');
+                        const lat = parseFloat(coords[0].trim());
+                        const lng = parseFloat(coords[1].trim());
+                        
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const marker = L.marker([lat, lng]).addTo(map);
+                            marker.bindPopup(`
+                                <b>Дефект:</b> {{ defect.defect_name }}<br>
+                                <b>Тип:</b> {{ defect.defect_type }}<br>
+                                <b>Описание:</b> {{ defect.defect_description }}<br>
+                                <b>Дата:</b> {{ defect.defect_date|date:"d.m.Y H:i" }}
+                            `);
+                        }
+                    } catch (e) {
+                        console.error("Ошибка обработки координат дефекта:", e);
+                    }
+                {% endif %}
+            {% endfor %}
+
+            // Автоматически масштабируем карту, если есть дефекты
+            {% if defects %}
+                const group = new L.featureGroup();
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        group.addLayer(layer);
+                    }
+                });
+                
+                if (group.getLayers().length > 0) {
+                    map.fitBounds(group.getBounds().pad(0.2));
+                }
+            {% endif %}
+        });
+    </script>
 
     <div class="research-description">
         <h3>Описание:</h3>
