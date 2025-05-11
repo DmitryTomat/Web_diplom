@@ -58,7 +58,7 @@ class ResearchFileForm(forms.ModelForm):
 class DefectForm(forms.ModelForm):
     class Meta:
         model = Defect
-        fields = ['research', 'defect_date', 'defect_name', 'defect_description', 'defect_coordinates', 'defect_type']
+        fields = ['defect_name', 'defect_description', 'defect_date', 'defect_coordinates', 'defect_type']
         widgets = {
             'defect_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
@@ -67,7 +67,7 @@ class DefectForm(forms.ModelForm):
         coordinates = self.cleaned_data.get('defect_coordinates')
         try:
             lat, lon = map(str.strip, coordinates.split(','))
-            float(lat)
+            float(lat)  # Проверяем что это числа
             float(lon)
             return coordinates
         except (ValueError, AttributeError):

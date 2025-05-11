@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование дефекта - {{ defect.defect_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Редактирование дефекта</h2>
+    <p>Исследование: <a href="{% url 'research_detail' research.id %}">{{ research.title }}</a></p>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <a href="{% url 'research_detail' research.id %}" class="btn btn-secondary">Отмена</a>
+            <a href="{% url 'delete_defect' defect.id %}" class="btn btn-danger">Удалить дефект</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .form-actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    form p {
+        margin-bottom: 15px;
+    }
+    
+    form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    form input, form textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    form textarea {
+        min-height: 100px;
+    }
+</style>
+{% endblock %}

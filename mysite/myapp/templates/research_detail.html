@@ -33,7 +33,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Создаем карту с центром по умолчанию
             const map = L.map('map').setView([55.751244, 37.618423], 10); // Центр - Москва
-            
+
             // Добавляем слой OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -46,7 +46,7 @@
                         const coords = "{{ defect.defect_coordinates }}".split(',');
                         const lat = parseFloat(coords[0].trim());
                         const lng = parseFloat(coords[1].trim());
-                        
+
                         if (!isNaN(lat) && !isNaN(lng)) {
                             const marker = L.marker([lat, lng]).addTo(map);
                             marker.bindPopup(`
@@ -70,7 +70,7 @@
                         group.addLayer(layer);
                     }
                 });
-                
+
                 if (group.getLayers().length > 0) {
                     map.fitBounds(group.getBounds().pad(0.2));
                 }
@@ -149,11 +149,17 @@
                                 <td>{{ defect.defect_description|truncatechars:30 }}</td>
                                 <td>{{ defect.defect_date|date:"d.m.Y H:i" }}</td>
                                 <td>{{ defect.defect_coordinates }}</td>
-                                <td>{{ defect.defect_type }}</td>
+                                <td>{{ defect.defect_type }}</td>                    
+                                <td class="actions">
+                                    <a href="{% url 'edit_defect' defect.id %}" class="btn btn-sm btn-edit">Ред.</a>
+                                    <a href="{% url 'delete_defect' defect.id %}" class="btn btn-sm btn-delete">Удл.</a>
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
+
                 </table>
+
             </div>
         {% else %}
             <p class="no-defects">Дефекты не добавлены</p>
@@ -165,14 +171,14 @@
 </div>
 
 <script>
-    // Подтверждение удаления маршрута
+    // В research_detail.html добавим этот скрипт
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', function(e) {
-            if (this.href.includes('delete_route')) {
+            if (this.href.includes('delete_defect')) {
                 e.preventDefault();
                 Swal.fire({
-                    title: 'Удалить маршрут?',
-                    text: 'Вы уверены, что хотите удалить маршрут этого исследования?',
+                    title: 'Удалить дефект?',
+                    text: 'Вы уверены, что хотите удалить этот дефект?',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Да, удалить',
@@ -186,4 +192,28 @@
         });
     });
 </script>
+
+<script>
+    // В research_detail.html добавим этот скрипт
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.href.includes('delete_defect')) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Удалить дефект?',
+                    text: 'Вы уверены, что хотите удалить этот дефект?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Да, удалить',
+                    cancelButtonText: 'Отмена'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = this.href;
+                    }
+                });
+            }
+        });
+    });
+</script>
+
 {% endblock %}

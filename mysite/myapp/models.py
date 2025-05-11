@@ -58,7 +58,10 @@ class Defect(models.Model):
         )
 
     def __str__(self):
-        return f"{self.defect_name} - {self.research.title}"
+        return f"{self.defect_name} ({self.defect_type}) - {self.research.title}"
+
+    def get_absolute_url(self):
+        return reverse('research_detail', kwargs={'research_id': self.research.id})
 
 class News(models.Model):
     title = models.CharField(max_length=255)

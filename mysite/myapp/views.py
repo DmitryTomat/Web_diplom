@@ -227,6 +227,48 @@ def add_defect_view(request, research_id):
         form = DefectForm(initial={'research': research})
     return render(request, 'add_defect.html', {'form': form, 'research': research})
 
+@login_required
+def edit_defect(request, defect_id):
+    defect = get_object_or_404(Defect, id=defect_id)
+    research = defect.research
+
+    # Проверяем, что дефект принадлежит исследованию текущего пользователя
+    if research.user != request.user:
+        return HttpResponseForbidden("У вас нет прав редактировать этот дефект")
+
+    if request.method == 'POST':
+        form = DefectForm(request.POST, instance=defect)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Дефект успешно обновлен')
+            return redirect('research_detail', research_id=research.id)
+    else:
+        form = DefectForm(instance=defect)
+
+    return render(request, 'edit_defect.html', {
+        'form': form,
+        'defect': defect,
+        'research': research
+    })
+
+@login_required
+def delete_defect(request, defect_id):
+    defect = get_object_or_404(Defect, id=defect_id)
+    research = defect.research
+
+    if research.user != request.user:
+        return HttpResponseForbidden("У вас нет прав удалять этот дефект")
+
+    if request.method == 'POST':
+        defect.delete()
+        messages.success(request, 'Дефект успешно удален')
+        return redirect('research_detail', research_id=research.id)
+
+    return render(request, 'confirm_delete_defect.html', {
+        'defect': defect,
+        'research': research
+    })
+
 
 @login_required
 def upload_xml_view(request):

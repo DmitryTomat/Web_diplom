@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление дефекта - {{ defect.defect_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Подтверждение удаления</h2>
+    <p>Вы уверены, что хотите удалить дефект "{{ defect.defect_name }}" из исследования "{{ research.title }}"?</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Да, удалить</button>
+            <a href="{% url 'research_detail' research.id %}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .form-actions {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+</style>
+{% endblock %}
